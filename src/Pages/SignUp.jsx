@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Eye, EyeOff, AlertCircle, Loader2, Mail, Shield } from 'lucide-react';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // ===== Utils
 const validateEmail = (email) => {
@@ -120,7 +121,7 @@ const OTPInput = ({ otp, setOtp, error }) => {
 export default function VaultSignUpPage({
   onSuccess,
   onError,
-  apiEndpoint = `https://lucille-unbatted-monica.ngrok-free.dev/auth/createUser`,
+  apiEndpoint = `${BASE_URL}auth/createUser`
 }) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({ email: '', username: '', password: '', confirmPassword: '' });
@@ -290,9 +291,7 @@ export default function VaultSignUpPage({
 
     try {
       const response = await fetch(
-        `https://lucille-unbatted-monica.ngrok-free.dev/auth/verification?email=${encodeURIComponent(
-          formData.email.trim()
-        )}`,
+         `${BASE_URL}auth/verification?email=${encodeURIComponent(formData.email.trim())}`,
         {
           method: 'POST',
           headers: {

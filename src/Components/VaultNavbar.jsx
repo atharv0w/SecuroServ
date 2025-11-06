@@ -1,37 +1,65 @@
 // src/Components/VaultNavbar.jsx
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { LayoutDashboard } from "lucide-react";
 
 const UNITS = "MB";
 
-// --- API Fetch Helper ---
-async function fetchStorageFromAPI(token) {
-  const headers = {};
-  if (token) headers["Authorization"] = `Bearer ${token}`;
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-  // TODO: replace this placeholder with your real endpoint
-  const res = await fetch("api", { method: "POST", headers });
-  if (res.status === 401) throw new Error("Session expired. Please sign in again.");
-  if (!res.ok) throw new Error("Failed to fetch storage");
+
+function getToken() {
+  return (
+    localStorage.getItem("token") ||
+    localStorage.getItem("sv_token") ||
+    localStorage.getItem("authToken") ||
+    ""
+  );
+}
+
+async function fetchStorageFromAPI() {
+  const token = getToken();
+  if (!token) throw new Error("No auth token found");
+
+    const res = await fetch(`${API_BASE}api/storage/used`, {
+
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      "ngrok-skip-browser-warning": "true",
+    },
+    credentials: "include",
+  });
+
+  if (res.status === 401)
+    throw new Error("Session expired. Please sign in again.");
+  if (!res.ok)
+    throw new Error(`Failed to fetch storage (${res.statusText})`);
+
+  const contentType = res.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    throw new Error("Unexpected response (HTML received instead of JSON)");
+  }
 
   const data = await res.json();
+  const usedMB = Number(data?.usedMB ?? 0);
+  const usedGB = Number(data?.usedGB ?? 0);
+  const usedBytes = Number(data?.usedBytes ?? 0);
 
-  let used = Number(data?.usedStorage) || 0;
-  let total = Number(data?.maxStorage) || 0;
+  const maxStorageMB = 500;
 
-  if (UNITS === "BYTES") {
-    used = used / (1000 * 1000);
-    total = total / (1000 * 1000);
-  }
+  let used = 0;
+  if (UNITS === "MB") used = usedMB;
+  else if (UNITS === "GB") used = usedGB;
+  else used = usedBytes / (1000 * 1000);
 
   return {
     usedStorage: used,
-    maxStorage: total,
-    plan: data?.plan,
-    updatedAt: data?.updatedAt,
+    maxStorage: maxStorageMB,
   };
 }
 
-// --- Navbar Component ---
 const VaultNavbar = () => {
   const [storageData, setStorageData] = useState({
     used: 0,
@@ -40,12 +68,12 @@ const VaultNavbar = () => {
     error: "",
   });
   const mounted = useRef(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     mounted.current = true;
     fetchStorageData();
-    const intervalId = setInterval(fetchStorageData, 60000); // refresh every 60s
-
+    const intervalId = setInterval(fetchStorageData, 60000);
     return () => {
       mounted.current = false;
       clearInterval(intervalId);
@@ -54,10 +82,10 @@ const VaultNavbar = () => {
 
   const fetchStorageData = async () => {
     try {
-      if (mounted.current) setStorageData((s) => ({ ...s, loading: true, error: "" }));
+      if (mounted.current)
+        setStorageData((s) => ({ ...s, loading: true, error: "" }));
 
-      const token = localStorage.getItem("token") ?? undefined;
-      const info = await fetchStorageFromAPI(token);
+      const info = await fetchStorageFromAPI();
 
       if (mounted.current)
         setStorageData({
@@ -83,9 +111,18 @@ const VaultNavbar = () => {
   const isNearLimit = pct > 80;
 
   return (
-    <div className="h-16 flex items-center justify-between px-8 border-b border-neutral-800 bg-[#0E0E0F]">
-      {/* Left: Title */}
-      <div className="text-sm font-semibold text-neutral-200">Vault</div>
+    <div className="h-16 flex items-center justify-between px-8 border-b border-neutral-700 bg-[#121212]">
+      {/* Left: Dashboard Button */}
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="flex items-center gap-2 bg-neutral-800 text-white px-3 py-1.5 rounded-md font-medium text-sm shadow-sm hover:bg-neutral-700 hover:shadow-md hover:scale-[1.03] active:scale-95 transition-all duration-200"
+      >
+        <LayoutDashboard
+          size={18}
+          className="transition-transform duration-200 group-hover:-translate-x-0.5"
+        />
+        <span>Dashboard</span>
+      </button>
 
       {/* Right: Storage Info */}
       <div className="flex items-center gap-3">
@@ -109,8 +146,7 @@ const VaultNavbar = () => {
                 isNearLimit ? "text-orange-400" : "text-neutral-400"
               }`}
             >
-              {Math.round(storageData.used)}MB /{" "}
-              {Math.round(storageData.total)}MB
+              {storageData.used.toFixed(2)}MB / {storageData.total}MB
             </span>
 
             <div

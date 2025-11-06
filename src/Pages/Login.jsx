@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff, AlertCircle, Shield, Loader2 } from "lucide-react";
 import { setAuth, fetchMe } from "../auth";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // --- validators ---
 const emailRegex =
@@ -16,11 +17,7 @@ const isUsername = (v) =>
 const validatePassword = (password) => password.length >= 6 && password.length <= 128;
 
 export default function LogInPage({
-  loginEndpoint =
-    (typeof import.meta !== "undefined"
-      ? import.meta.env.VITE_API_BASE
-      : process.env.REACT_APP_API_BASE) ||
-    "https://lucille-unbatted-monica.ngrok-free.dev/",
+  loginEndpoint = `${BASE_URL}`,
   onSuccessNavigateTo = "/dashboard", // change if you want
 }) {
   const navigate = useNavigate();
@@ -45,7 +42,7 @@ export default function LogInPage({
   }, [message]);
 
   const loginApiCall = async (identifier, password) => {
-    const url = `${loginEndpoint.replace(/\/+$/, "")}/auth/login`;
+    const url = `${BASE_URL}auth/login`;
     const body = idIsEmail
       ? { email: identifier.trim(), password }
       : { username: identifier.trim(), password };

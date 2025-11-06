@@ -8,10 +8,16 @@ import {
   Power,
 } from "lucide-react";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+// ✅ Auth hook
 const useAuth = () => {
   const [user, setUser] = useState(null);
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    const token =
+      localStorage.getItem("token") ||
+      localStorage.getItem("sv_token") ||
+      localStorage.getItem("authToken");
     const username = localStorage.getItem("username") || "User";
     if (token) setUser({ username });
   }, []);
@@ -37,7 +43,6 @@ const FrostedCard = ({ children, className = "" }) => {
         className
       }
     >
-      {/* Light follows cursor */}
       <div
         className="pointer-events-none absolute inset-0 rounded-3xl opacity-30 transition-opacity duration-300"
         style={{
@@ -50,6 +55,7 @@ const FrostedCard = ({ children, className = "" }) => {
   );
 };
 
+// 🌈 Gradient progress bar
 const GradientProgress = ({ percent }) => (
   <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-900/50">
     <div
@@ -64,53 +70,125 @@ export default function Dashboard() {
   const [greeting, setGreeting] = useState("Welcome");
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // ✅ State for storage data (in MB)
+  const [storage, setStorage] = useState({
+    usedMB: 0,
+    totalMB: 500,
+    loading: true,
+    error: "",
+  });
+
+  // Greeting animation
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting("Good morning");
     else if (hour < 18) setGreeting("Good afternoon");
     else setGreeting("Good evening");
 
-    // Delay for animation effect
     const timeout = setTimeout(() => setIsLoaded(true), 300);
     return () => clearTimeout(timeout);
   }, []);
+
+  // ✅ Fetch storage API with token
+  useEffect(() => {
+    const fetchStorage = async () => {
+      try {
+        const token =
+          localStorage.getItem("token") ||
+          localStorage.getItem("sv_token") ||
+          localStorage.getItem("authToken");
+
+        if (!token) throw new Error("No auth token found");
+
+        const res = await fetch(`${API_BASE}api/storage/used`, {
+
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          credentials: "include",
+        });
+
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+
+        const data = await res.json();
+
+        setStorage({
+          usedMB: data.usedMB ?? 0,
+          totalMB: 500,
+          loading: false,
+          error: "",
+        });
+      } catch (err) {
+        setStorage({
+          usedMB: 0,
+          totalMB: 500,
+          loading: false,
+          error: err.message || "Failed to load storage data",
+        });
+      }
+    };
+
+    fetchStorage();
+  }, []);
+
+  // ✅ Logout handler
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("token");
+    localStorage.removeItem("sv_token");
+    localStorage.removeItem("username");
+    window.location.href = "/login";
+  };
 
   const navigateToVault = () => {
     window.location.href = "/data-uploads";
   };
 
+  const percent =
+    storage.totalMB > 0
+      ? Math.min((storage.usedMB / storage.totalMB) * 100, 100)
+      : 0;
+
   return (
     <div className="relative min-h-screen isolate overflow-hidden text-white">
-      {/* 🌌 Static matte background */}
+      {/* Background */}
       <div className="absolute inset-0 bg-[#0a0a0a]" />
-
-      {/* ✨ Soft vignette layer for depth and seamless edges */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.02)_0%,rgba(0,0,0,1)_100%)] opacity-[0.08] pointer-events-none" />
 
       {/* Main Content */}
       <div
-        className={`relative z-10 mx-auto max-w-7xl px-6 py-14 transition-all duration-1500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+        className={`relative z-10 mx-auto max-w-7xl px-6 py-14 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] ${
           isLoaded
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-10 blur-sm"
         }`}
       >
-        {/* Greeting Section */}
+        {/* Greeting */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-14">
           <div className="space-y-1">
             <h1 className="text-5xl font-semibold tracking-tight bg-gradient-to-r from-white via-gray-300 to-zinc-400 bg-clip-text text-transparent">
-              {greeting}, {user ? user.username : "User"} 
+              {greeting}, {user ? user.username : "User"}
             </h1>
             <p className="text-zinc-500 text-sm">
               Manage and protect your digital assets effortlessly.
             </p>
           </div>
 
+          {/* Top Right Icons */}
           <div className="mt-6 md:mt-0 flex items-center gap-3">
             <div className="size-11 grid place-items-center rounded-full bg-zinc-900/60 shadow-inner hover:bg-zinc-800/70 transition-transform hover:scale-110">
               <Cpu className="w-5 h-5 text-zinc-400" />
             </div>
-            <div className="size-11 grid place-items-center rounded-full bg-zinc-900/60 shadow-inner cursor-pointer hover:bg-zinc-800/70 transition-transform hover:scale-110">
+
+            {/* ✅ Power Icon now logs out */}
+            <div
+              onClick={handleLogout}
+              className="size-11 grid place-items-center rounded-full bg-zinc-900/60 shadow-inner cursor-pointer hover:bg-neutral-800/70 hover:shadow-[0_0_10px_rgba(255,0,0,0.4)] transition-transform hover:scale-110 active:scale-95"
+              title="Logout"
+            >
               <Power className="w-5 h-5 text-red-400" />
             </div>
           </div>
@@ -118,30 +196,47 @@ export default function Dashboard() {
 
         {/* Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
+          {/* Storage Card */}
           <FrostedCard className="p-6 group">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs uppercase text-zinc-500/90">
                   Storage Used
                 </p>
-                <h3 className="text-3xl font-semibold mt-2 text-white/90 group-hover:text-white">
-                  2.4 GB
-                </h3>
+
+                {storage.loading ? (
+                  <h3 className="text-lg text-zinc-500 mt-2">Loading...</h3>
+                ) : storage.error ? (
+                  <h3 className="text-sm text-red-400 mt-2">{storage.error}</h3>
+                ) : (
+                  <h3 className="text-3xl font-semibold mt-2 text-white/90 group-hover:text-white">
+                    {storage.usedMB.toFixed(2)} MB
+                  </h3>
+                )}
               </div>
               <div className="size-11 grid place-items-center rounded-xl bg-gradient-to-tr from-purple-600/15 to-indigo-500/15 group-hover:from-purple-500/25 group-hover:to-indigo-500/25 transition">
                 <HardDrive className="w-5 h-5 text-white/80" />
               </div>
             </div>
+
             <div className="mt-5">
-              <GradientProgress percent={24} />
+              <GradientProgress percent={percent} />
             </div>
-            <p className="text-xs text-zinc-500 mt-2 text-right">2.4 / 10 GB</p>
+
+            {!storage.loading && !storage.error && (
+              <p className="text-xs text-zinc-500 mt-2 text-right">
+                {storage.usedMB.toFixed(2)} / {storage.totalMB} MB
+              </p>
+            )}
           </FrostedCard>
 
+          {/* Encryption Card */}
           <FrostedCard className="p-6 group">
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-xs uppercase text-zinc-500/90">Encryption</p>
+                <p className="text-xs uppercase text-zinc-500/90">
+                  Encryption
+                </p>
                 <h3 className="text-3xl font-semibold mt-2 text-white/90 group-hover:text-white">
                   AES-256
                 </h3>
@@ -155,12 +250,15 @@ export default function Dashboard() {
             </p>
           </FrostedCard>
 
+          {/* Vault Status Card */}
           <FrostedCard className="p-6 group">
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-xs uppercase text-zinc-500/90">Vault Status</p>
+                <p className="text-xs uppercase text-zinc-500/90">
+                  Vault Status
+                </p>
                 <h3 className="text-3xl font-semibold mt-2 text-white/90 group-hover:text-white">
-                  Active
+                  {storage.error ? "Inactive" : "Active"}
                 </h3>
               </div>
               <div className="size-11 grid place-items-center rounded-xl bg-gradient-to-tr from-blue-600/15 to-cyan-500/15 group-hover:from-blue-500/25 group-hover:to-cyan-500/25 transition">
@@ -168,7 +266,9 @@ export default function Dashboard() {
               </div>
             </div>
             <p className="text-xs text-zinc-500 mt-5">
-              Files are safely encrypted and synced.
+              {storage.error
+                ? "Vault disconnected. Try reloading."
+                : "Files are safely encrypted and synced."}
             </p>
           </FrostedCard>
         </div>

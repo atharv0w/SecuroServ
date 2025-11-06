@@ -2,10 +2,8 @@ import React, { useCallback, useState } from "react";
 import DualDragAndDrop from "../Components/DualDragAndDrop.jsx";
 import VaultGrid from "../Components/VaultGrid.jsx";
 
-const API_BASE =
-  (import.meta.env.VITE_API_BASE ||
-    import.meta.env.VITE_API_BASE_URL ||
-    "https://lucille-unbatted-monica.ngrok-free.dev").replace(/\/+$/, "");
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 
 function getToken() {
   return (
@@ -29,7 +27,7 @@ export default function FileUploadPage() {
       const form = new FormData();
       newFiles.forEach((f) => form.append("files", f));
 
-      const res = await fetch(`${API_BASE}/encryption/upload`, {
+      const res = await fetch(`${API_BASE}encryption/upload`, {
         method: "POST",
         body: form,
         headers: {
@@ -112,7 +110,7 @@ export default function FileUploadPage() {
       form.append("relativePath", it.relativePath);
     }
 
-    const res = await fetch(`${API_BASE}/encryption/upload-folder`, {
+    const res = await fetch(`${API_BASE}encryption/upload-folder`, {
       method: "POST",
       body: form, // DO NOT set Content-Type manually
       headers: {

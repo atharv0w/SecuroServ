@@ -6,9 +6,16 @@ export default function DashNavbar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // ✅ Clear stored session data
+    // ✅ Clear all possible stored session keys
     localStorage.removeItem("authToken");
+    localStorage.removeItem("token");
+    localStorage.removeItem("sv_token");
     localStorage.removeItem("username");
+
+    // Optionally clear all localStorage (uncomment if you prefer total reset)
+    // localStorage.clear();
+
+    // ✅ Redirect to login
     navigate("/login");
   };
 
@@ -16,7 +23,7 @@ export default function DashNavbar() {
     <header className="w-full bg-[#1a1a1a] border-b border-neutral-800 px-6 py-3 flex justify-between items-center">
       {/* Left side - Logo and title */}
       <div className="flex items-center space-x-2">
-        <Lock className="size{24} text-white" />
+        <Lock className="w-5 h-5 text-white" />
         <h1 className="text-2xl font-semibold text-white">
           SecuroServ
         </h1>
@@ -26,7 +33,7 @@ export default function DashNavbar() {
       <div className="flex items-center space-x-4">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 bg-white text-black px-4 py-1.5 rounded-md font-medium hover:bg-gray-200 transition"
+          className="flex items-center gap-2 bg-white text-black px-4 py-1.5 rounded-md font-medium hover:bg-gray-200 active:scale-95 transition-all duration-150"
         >
           <LogOut className="w-4 h-4" />
           Logout

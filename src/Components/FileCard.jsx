@@ -39,15 +39,7 @@ const FileCard = ({ item, onClick, onDownload }) => {
 
       <p className="text-xs text-gray-400 mt-1">{formattedDate}</p>
 
-      {isFile && (
-        <button
-          onClick={handleDownload}
-          className="mt-3 text-xs bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded-full transition-all duration-200"
-        >
-          <Download size={14} className="inline mr-1" />
-          Download
-        </button>
-      )}
+      
     </div>
   );
 };

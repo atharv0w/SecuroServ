@@ -46,16 +46,24 @@ const Features = () => {
         </motion.div>
 
         <motion.h1
-          variants={fadeIn}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.1 }}
-          className="text-5xl font-semibold tracking-tight mb-6 text-white"
-        >
-          Built with precision.  
-          <br />
-          Designed for <span className="text-gray-400">security.</span>
-        </motion.h1>
+  variants={fadeIn}
+  initial="hidden"
+  animate="visible"
+  transition={{ delay: 0.1, duration: 0.9, ease: "easeOut" }}
+  className="text-center text-[2.5rem] sm:text-[3.5rem] md:text-[4.25rem]
+             font-[450] tracking-tight leading-[1.1]
+             bg-gradient-to-b from-zinc-100 to-zinc-400 bg-clip-text text-transparent
+             font-[system-ui] 
+             [font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue','Helvetica','Arial',sans-serif]
+             antialiased drop-shadow-[0_1px_4px_rgba(255,255,255,0.05)] select-none"
+>
+  Built with <span className="font-light text-zinc-300">precision.</span>
+  <br />
+  Designed for{" "}
+  <span className="text-zinc-50 font-medium hover:text-zinc-200 transition-colors duration-700">
+    security.
+  </span>
+</motion.h1>
 
         <motion.p
           variants={fadeIn}

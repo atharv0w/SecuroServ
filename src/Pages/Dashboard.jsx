@@ -14,7 +14,7 @@ export default function Dashboard() {
 
   const handlePayment = () => {
     const options = {
-      key: "rzp_test_YourKeyHere", // 🧪 replace with your test key
+      key: "rzp_test_RcroVaZbZlLpxT", // 🧪 replace with your test key
       amount: 19900, // amount in paise (₹199)
       currency: "INR",
       name: "SecuroServ",

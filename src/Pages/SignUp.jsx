@@ -503,13 +503,21 @@ window.location.href = "/dashboard";
             )}
 
             <button
-              type="button"
-              onClick={handleSubmitStep1}
-              disabled={isSubmitting}
-              className="w-full bg-white hover:bg-zinc-100 disabled:bg-zinc-800 disabled:text-zinc-600 text-black font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 mt-2"
-            >
-              Continue
-            </button>
+  type="button"
+  onClick={handleSubmitStep1}
+  disabled={isSubmitting}
+  className="w-full bg-white hover:bg-zinc-100 disabled:bg-zinc-800 disabled:text-zinc-600 text-black font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 mt-2 flex items-center justify-center gap-2"
+>
+  {isSubmitting ? (
+    <>
+      <Loader2 size={18} className="animate-spin text-black" />
+      Creating Account…
+    </>
+  ) : (
+    "Continue"
+  )}
+</button>
+
 
             <p className="text-[11px] text-zinc-500 text-center">
               By continuing you agree to our privacy-first, zero-knowledge policy.

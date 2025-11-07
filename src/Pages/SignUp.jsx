@@ -158,7 +158,7 @@ export default function VaultSignUpPage({
         isValid: usernameValid,
         error:
           !usernameValid && touched.username
-            ? '3–20 chars, start with a letter, use letters/numbers/._-'
+            ? '3–20 chars, start with a letter, use letters/numbers/._-, no spaces'
             : '',
       },
       password: {

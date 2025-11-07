@@ -40,7 +40,17 @@ export default function LogInPage({
     const t = setTimeout(() => setMessage({ type: "", text: "" }), message.type === "success" ? 3000 : 5000);
     return () => clearTimeout(t);
   }, [message]);
-
+  useEffect(() => {
+  // Check if user was redirected back here after failed login
+  const redirected = sessionStorage.getItem("loginRedirectFlag");
+  if (redirected) {
+    setMessage({
+      type: "error",
+      text: "Incorrect email or password. Please try again.",
+    });
+    sessionStorage.removeItem("loginRedirectFlag");
+  }
+}, []);
   const loginApiCall = async (identifier, password) => {
     const url = `${BASE_URL}auth/login`;
     const body = idIsEmail
@@ -110,7 +120,10 @@ export default function LogInPage({
       setMessage({ type: "success", text: "Login successful!" });
 
       // tiny delay so localStorage writes settle
-      setTimeout(() => navigate(onSuccessNavigateTo, { replace: true }), 120);
+      setTimeout(() => {
+  sessionStorage.setItem("loginRedirectFlag", "1");
+  navigate(onSuccessNavigateTo, { replace: true });
+}, 120);
     } catch (err) {
       setMessage({ type: "error", text: err?.message || "Network error. Please try again." });
     } finally {

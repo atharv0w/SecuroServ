@@ -166,7 +166,7 @@ export default function MyVault() {
                         {/* ✅ Fixed Download button */}
                         <button
                           onClick={() =>
-                            download(`${API_BASE}/api/vault/decrypt/${f.fileId}`, f.name)
+                            download(`${API_BASE}api/vault/decrypt/${f.fileId}`, f.name)
                           }
                           className="px-4 py-1.5 text-xs bg-indigo-500/20 text-indigo-300 rounded-lg hover:bg-indigo-500/40 transition flex items-center justify-center gap-1"
                         >

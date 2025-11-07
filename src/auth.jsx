@@ -1,13 +1,35 @@
-// src/auth.jsx
-
-// === SecureVault Auth Utility ===
-const API_BASE = import.meta.env.VITE_API_BASE || "/api";
+/* -------------------------------------------------------------------------- */
+/* 🔑 Global API Base                                                         */
+/* -------------------------------------------------------------------------- */
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_BASE ||
+  "/api";
 
 /* -------------------------------------------------------------------------- */
-/* 🧭 Getters                                                                 */
+/* 🧭 Token Utilities                                                         */
 /* -------------------------------------------------------------------------- */
-export const getToken = () => localStorage.getItem("sv_token") || null;
-export const getRole = () => localStorage.getItem("sv_role") || null;
+
+/**
+ * ✅ Retrieves the best available token.
+ * Looks through all possible storage keys.
+ */
+export const getToken = () => {
+  const possibleKeys = ["sv_token", "token", "authToken", "sv_auth"];
+  for (const key of possibleKeys) {
+    const val = localStorage.getItem(key);
+    if (val && typeof val === "string" && val.split(".").length === 3) {
+      return val;
+    }
+  }
+  return null;
+};
+
+/* -------------------------------------------------------------------------- */
+/* 🧭 Role & User Utilities                                                   */
+/* -------------------------------------------------------------------------- */
+export const getRole = () => localStorage.getItem("sv_role") || "USER";
+
 export const getUser = () => {
   try {
     return JSON.parse(localStorage.getItem("sv_user") || "null");
@@ -20,7 +42,7 @@ export const getUser = () => {
 /* 🔐 Auth State Management                                                   */
 /* -------------------------------------------------------------------------- */
 export const setAuth = ({ token, role, user }) => {
-  // ✅ Strict token validation (must be a valid JWT)
+  // ✅ Store only valid JWT
   const isValidToken =
     typeof token === "string" &&
     token.split(".").length === 3 &&
@@ -31,12 +53,11 @@ export const setAuth = ({ token, role, user }) => {
   if (isValidToken) {
     localStorage.setItem("sv_token", token);
   } else {
-    // Prevent storing "true", null, [object Object], etc.
     console.warn("[SecureVault] Invalid token detected → clearing storage");
-    localStorage.removeItem("sv_token");
+    clearAuth();
   }
 
-  if (role) localStorage.setItem("sv_role", role);
+  if (role) localStorage.setItem("sv_role", role.toUpperCase());
   if (user) localStorage.setItem("sv_user", JSON.stringify(user));
 };
 
@@ -44,17 +65,22 @@ export const setAuth = ({ token, role, user }) => {
 /* 🧹 Clear Everything                                                        */
 /* -------------------------------------------------------------------------- */
 export const clearAuth = () => {
-  localStorage.removeItem("sv_token");
-  localStorage.removeItem("sv_role");
-  localStorage.removeItem("sv_user");
+  const keys = [
+    "sv_token",
+    "token",
+    "authToken",
+    "sv_auth",
+    "sv_role",
+    "sv_user",
+  ];
+  keys.forEach((k) => localStorage.removeItem(k));
 };
 
 /* -------------------------------------------------------------------------- */
 /* 🧼 Sanitize Storage on Startup                                             */
 /* -------------------------------------------------------------------------- */
 export const sanitizeAuthStorage = () => {
-  const token = localStorage.getItem("sv_token");
-
+  const token = getToken();
   const isInvalid =
     !token ||
     token === "null" ||
@@ -70,47 +96,50 @@ export const sanitizeAuthStorage = () => {
 };
 
 /* -------------------------------------------------------------------------- */
-/* 🧾 Fetch User Info                                                         */
+/* 🧾 Fetch User Info (Now same style as MyVault.jsx)                         */
 /* -------------------------------------------------------------------------- */
 export const fetchMe = async () => {
   const token = getToken();
 
-  // 🧠 Validate before using
-  if (
-    !token ||
-    typeof token !== "string" ||
-    token.split(".").length !== 3 ||
-    token === "null" ||
-    token === "undefined"
-  ) {
-    console.warn("[SecureVault:fetchMe] Skipping invalid token");
+  if (!token) {
+    console.warn("[SecureVault:fetchMe] No valid token found");
     clearAuth();
     return null;
   }
 
   try {
-    const res = await fetch(`${API_BASE}/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` },
+    const res = await fetch(`${API_BASE}auth/me`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "ngrok-skip-browser-warning": "true", // 👈 same as MyVault.jsx
+        "X-Auth-Token": token, // 👈 optional helper header
+        "X-Session-Token": token, // 👈 optional helper header
+      },
+      credentials: "include", // 👈 important for secured cookies / CORS
     });
 
-    if (!res.ok) throw new Error("Auth /me failed");
+    if (!res.ok) throw new Error(`Auth /me failed (${res.status})`);
     const data = await res.json();
 
-    const role = data?.role || data?.user?.role || data?.data?.role || "user";
-    const user = data?.user || data || null;
+    // ✅ Normalize structure
+    const role = data?.role || data?.user?.role || "USER";
+    const user = data?.user || data;
 
     setAuth({ token, role, user });
     return { role, user };
   } catch (err) {
-    console.warn("[SecureVault:fetchMe] Fallback to JWT decode");
+    console.warn("[SecureVault:fetchMe] Fallback to JWT decode", err.message);
 
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
       const role =
-        payload?.role || payload?.roles?.[0] || payload?.userType || "user";
+        payload?.role || payload?.roles?.[0] || payload?.userType || "USER";
       setAuth({ token, role });
       return { role, user: null };
-    } catch {
+    } catch (decodeErr) {
       console.error("[SecureVault:fetchMe] Token decode failed → clearing auth");
       clearAuth();
       return null;

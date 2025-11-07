@@ -6,7 +6,10 @@ import {
   ChevronRight,
   Cpu,
   Power,
+  Crown,
+  X,
 } from "lucide-react";
+import MembershipCard from "../Components/MembershipCard";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
@@ -69,8 +72,10 @@ export default function Dashboard() {
   const user = useAuth();
   const [greeting, setGreeting] = useState("Welcome");
   const [isLoaded, setIsLoaded] = useState(false);
+  const [role, setRole] = useState("USER");
+  const [showMembership, setShowMembership] = useState(false);
 
-  // ✅ State for storage data (in MB)
+  // ✅ Storage data
   const [storage, setStorage] = useState({
     usedMB: 0,
     totalMB: 500,
@@ -89,9 +94,9 @@ export default function Dashboard() {
     return () => clearTimeout(timeout);
   }, []);
 
-  // ✅ Fetch storage API with token
+  // ✅ Fetch storage & user role
   useEffect(() => {
-    const fetchStorage = async () => {
+    const fetchData = async () => {
       try {
         const token =
           localStorage.getItem("token") ||
@@ -100,8 +105,8 @@ export default function Dashboard() {
 
         if (!token) throw new Error("No auth token found");
 
-        const res = await fetch(`${API_BASE}api/storage/used`, {
-
+        // Storage API
+        const storageRes = await fetch(`${API_BASE}api/storage/used`, {
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -111,35 +116,44 @@ export default function Dashboard() {
           credentials: "include",
         });
 
-        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+        if (!storageRes.ok)
+          throw new Error(
+            `Error ${storageRes.status}: ${storageRes.statusText}`
+          );
 
-        const data = await res.json();
-
+        const storageData = await storageRes.json();
         setStorage({
-          usedMB: data.usedMB ?? 0,
+          usedMB: storageData.usedMB ?? 0,
           totalMB: 500,
           loading: false,
           error: "",
         });
+
+        // Role API (auth/me)
+        const roleRes = await fetch(`${API_BASE}auth/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+          credentials: "include",
+        });
+        const roleData = await roleRes.json();
+        if (roleData.role) setRole(roleData.role);
       } catch (err) {
         setStorage({
           usedMB: 0,
           totalMB: 500,
           loading: false,
-          error: err.message || "Failed to load storage data",
+          error: err.message || "Failed to load data",
         });
       }
     };
 
-    fetchStorage();
+    fetchData();
   }, []);
 
-  // ✅ Logout handler
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("token");
-    localStorage.removeItem("sv_token");
-    localStorage.removeItem("username");
+    localStorage.clear();
     window.location.href = "/login";
   };
 
@@ -183,7 +197,6 @@ export default function Dashboard() {
               <Cpu className="w-5 h-5 text-zinc-400" />
             </div>
 
-            {/* ✅ Power Icon now logs out */}
             <div
               onClick={handleLogout}
               className="size-11 grid place-items-center rounded-full bg-zinc-900/60 shadow-inner cursor-pointer hover:bg-neutral-800/70 hover:shadow-[0_0_10px_rgba(255,0,0,0.4)] transition-transform hover:scale-110 active:scale-95"
@@ -203,11 +216,12 @@ export default function Dashboard() {
                 <p className="text-xs uppercase text-zinc-500/90">
                   Storage Used
                 </p>
-
                 {storage.loading ? (
                   <h3 className="text-lg text-zinc-500 mt-2">Loading...</h3>
                 ) : storage.error ? (
-                  <h3 className="text-sm text-red-400 mt-2">{storage.error}</h3>
+                  <h3 className="text-sm text-red-400 mt-2">
+                    {storage.error}
+                  </h3>
                 ) : (
                   <h3 className="text-3xl font-semibold mt-2 text-white/90 group-hover:text-white">
                     {storage.usedMB.toFixed(2)} MB
@@ -234,9 +248,7 @@ export default function Dashboard() {
           <FrostedCard className="p-6 group">
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-xs uppercase text-zinc-500/90">
-                  Encryption
-                </p>
+                <p className="text-xs uppercase text-zinc-500/90">Encryption</p>
                 <h3 className="text-3xl font-semibold mt-2 text-white/90 group-hover:text-white">
                   AES-256
                 </h3>
@@ -250,26 +262,44 @@ export default function Dashboard() {
             </p>
           </FrostedCard>
 
-          {/* Vault Status Card */}
-          <FrostedCard className="p-6 group">
+          {/* 🪙 Membership Card */}
+          <FrostedCard className="p-6 group transition-all hover:shadow-[0_0_25px_rgba(255,215,0,0.15)]">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs uppercase text-zinc-500/90">
-                  Vault Status
+                  Membership Plan
                 </p>
-                <h3 className="text-3xl font-semibold mt-2 text-white/90 group-hover:text-white">
-                  {storage.error ? "Inactive" : "Active"}
+                <h3
+                  className={`text-3xl font-semibold mt-2 ${
+                    role === "PREMIUM"
+                      ? "text-yellow-400"
+                      : "text-white/90 group-hover:text-white"
+                  }`}
+                >
+                  {role === "PREMIUM" ? "Premium" : "Free"}
                 </h3>
               </div>
-              <div className="size-11 grid place-items-center rounded-xl bg-gradient-to-tr from-blue-600/15 to-cyan-500/15 group-hover:from-blue-500/25 group-hover:to-cyan-500/25 transition">
-                <FolderLock className="w-5 h-5 text-blue-400" />
+              <div className="size-11 grid place-items-center rounded-xl bg-gradient-to-tr from-yellow-500/15 to-amber-400/15 group-hover:from-yellow-500/25 group-hover:to-amber-400/25 transition">
+                <Crown className="w-5 h-5 text-yellow-400" />
               </div>
             </div>
+
             <p className="text-xs text-zinc-500 mt-5">
-              {storage.error
-                ? "Vault disconnected. Try reloading."
-                : "Files are safely encrypted and synced."}
+              {role === "PREMIUM"
+                ? "Enjoy unlimited secure storage and VIP support."
+                : "Upgrade to Premium for more storage and features."}
             </p>
+
+            {/* ✅ Inline render MembershipCard when clicked */}
+            <div className="mt-6">
+              <button
+                onClick={() => setShowMembership(true)}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-semibold py-2 transition-all hover:scale-[1.03] hover:shadow-[0_0_15px_rgba(255,215,0,0.3)] active:scale-[0.98]"
+              >
+                {role === "PREMIUM" ? "Manage Plan" : "View Plans"}
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </FrostedCard>
         </div>
 
@@ -302,6 +332,23 @@ export default function Dashboard() {
           </p>
         </div>
       </div>
+
+      {/* 🟡 Membership Modal */}
+      {showMembership && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl">
+            <button
+              onClick={() => setShowMembership(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="rounded-3xl overflow-hidden shadow-2xl">
+              <MembershipCard compact={false} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

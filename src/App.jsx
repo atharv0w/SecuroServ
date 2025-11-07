@@ -22,6 +22,7 @@ import ProtectedRoute from "./Components/ProtectedRoute.jsx";
 import { sanitizeAuthStorage } from "./auth.jsx";
 
 
+
 export default function App() {
   sanitizeAuthStorage();
 
@@ -94,10 +95,12 @@ export default function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
+              
               <Dashboard />
             </ProtectedRoute>
           }
         />
+        
 
         <Route
           element={

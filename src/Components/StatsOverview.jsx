@@ -197,7 +197,7 @@ const percent =
         {/* Greeting */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-14">
           <div className="space-y-1">
-            <h1 className="text-5xl font-semibold leading-[1.] tracking-tight bg-gradient-to-r from-white via-gray-300 to-zinc-400 bg-clip-text text-transparent">
+            <h1 className="text-5xl font-semibold leading-[1.5] tracking-tight bg-gradient-to-r from-white via-gray-300 to-zinc-400 bg-clip-text text-transparent">
               {greeting}, {user ? user.username : "User"}
             </h1>
             <p className="text-zinc-500 text-sm">

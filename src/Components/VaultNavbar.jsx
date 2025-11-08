@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LayoutDashboard } from "lucide-react";
 
-const UNITS = "MB";
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 function getToken() {
@@ -15,7 +14,24 @@ function getToken() {
   );
 }
 
-async function fetchStorageFromAPI() {
+async function fetchRoleFromAPI() {
+  const token = getToken();
+  if (!token) return "USER";
+
+  const res = await fetch(`${API_BASE}auth/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "ngrok-skip-browser-warning": "true",
+    },
+    credentials: "include",
+  });
+
+  if (!res.ok) return "USER";
+  const data = await res.json();
+  return data.role || "USER";
+}
+
+async function fetchStorageFromAPI(role) {
   const token = getToken();
   if (!token) throw new Error("No auth token found");
 
@@ -41,48 +57,57 @@ async function fetchStorageFromAPI() {
 
   const data = await res.json();
   const usedMB = Number(data?.usedMB ?? 0);
-  const usedGB = Number(data?.usedGB ?? 0);
-  const usedBytes = Number(data?.usedBytes ?? 0);
 
-  const maxStorageMB = 500;
-
-  let used = 0;
-  if (UNITS === "MB") used = usedMB;
-  else if (UNITS === "GB") used = usedGB;
-  else used = usedBytes / (1000 * 1000);
+  // 🧮 Dynamic total based on role
+  const maxStorageMB = role === "PREMIUM" ? 1024 * 100 : 1024 * 30; // Premium = 100GB, Standard = 30GB
 
   return {
-    usedStorage: used,
+    usedStorage: usedMB,
     maxStorage: maxStorageMB,
   };
+}
+
+// 🧩 Helper: format MB/GB nicely
+function formatStorage(mb) {
+  if (mb >= 1024) {
+    const gb = mb / 1024;
+    return `${gb.toFixed(2)} GB`;
+  }
+  return `${mb.toFixed(2)} MB`;
 }
 
 const VaultNavbar = () => {
   const [storageData, setStorageData] = useState({
     used: 0,
-    total: 500,
+    total: 0,
     loading: true,
     error: "",
   });
+  const [role, setRole] = useState("USER");
   const mounted = useRef(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     mounted.current = true;
-    fetchStorageData();
-    const intervalId = setInterval(fetchStorageData, 60000);
+    fetchAllData();
+    const intervalId = setInterval(fetchAllData, 60000);
     return () => {
       mounted.current = false;
       clearInterval(intervalId);
     };
   }, []);
 
-  const fetchStorageData = async () => {
+  const fetchAllData = async () => {
     try {
       if (mounted.current)
         setStorageData((s) => ({ ...s, loading: true, error: "" }));
 
-      const info = await fetchStorageFromAPI();
+      // Fetch role first
+      const userRole = await fetchRoleFromAPI();
+      setRole(userRole);
+
+      // Then fetch storage info
+      const info = await fetchStorageFromAPI(userRole);
 
       if (mounted.current)
         setStorageData({
@@ -117,7 +142,7 @@ const VaultNavbar = () => {
     >
       {/* Left: Dashboard Button */}
       <button
-        onClick={() => navigate("/dashboard")}
+        onClick={() => navigate('/dashboard')}
         className="
           flex items-center gap-2 bg-neutral-800 text-white 
           px-3 py-2 rounded-md font-medium text-sm shadow-sm
@@ -125,10 +150,7 @@ const VaultNavbar = () => {
           transition-all duration-200 w-full sm:w-auto justify-center md:justify-start
         "
       >
-        <LayoutDashboard
-          size={18}
-          className="transition-transform duration-200 group-hover:-translate-x-0.5"
-        />
+        <LayoutDashboard size={18} />
         <span className="hidden sm:inline">Dashboard</span>
       </button>
 
@@ -148,7 +170,7 @@ const VaultNavbar = () => {
             <span className="text-sm text-red-400">{storageData.error}</span>
             <button
               type="button"
-              onClick={fetchStorageData}
+              onClick={fetchAllData}
               className="px-3 py-1 text-xs bg-neutral-900 text-neutral-300 border border-neutral-800 rounded hover:bg-neutral-800 transition"
             >
               Retry
@@ -161,7 +183,7 @@ const VaultNavbar = () => {
                 isNearLimit ? "text-orange-400" : "text-neutral-400"
               }`}
             >
-              {storageData.used.toFixed(2)}MB / {storageData.total}MB
+              {formatStorage(storageData.used)} / {formatStorage(storageData.total)}
             </span>
 
             <div
@@ -174,7 +196,11 @@ const VaultNavbar = () => {
             >
               <div
                 className={`h-full transition-all ${
-                  isNearLimit ? "bg-orange-500" : "bg-neutral-600"
+                  role === "PREMIUM"
+                    ? "bg-yellow-500"
+                    : isNearLimit
+                    ? "bg-orange-500"
+                    : "bg-purple-600"
                 }`}
                 style={{ width: `${pct}%` }}
               />

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Crown, Lock, CheckCircle2 } from "lucide-react";
+import { Crown, Lock, CheckCircle2, Shield, X } from "lucide-react";
 import RazorpayButton from "./RazorpayButton";
 import { fetchMe } from "../auth";
 
-export default function MembershipCard({ compact = false }) {
+export default function MembershipCard({ onClose }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -28,73 +28,164 @@ export default function MembershipCard({ compact = false }) {
 
   return (
     <div
-      className={`${
-        compact ? "max-w-md" : "min-h-screen py-16"
-      } bg-[#0b0b0b] text-white flex flex-col items-center justify-center px-6`}
+      className="relative w-full max-w-4xl mx-auto mt-15 mb-5
+      bg-[#0e0e0e] rounded-3xl border border-zinc-800/50 shadow-[0_0_40px_rgba(0,0,0,0.35)] 
+      overflow-visible transition-all duration-300"
     >
-      {/* HEADER */}
-      {!compact && (
-        <div className="text-center mb-10">
-          <Crown className="w-14 h-14 text-yellow-400 mx-auto mb-4 drop-shadow-[0_0_20px_rgba(255,215,0,0.3)]" />
-          <h1 className="text-4xl font-semibold mb-2 bg-gradient-to-r from-yellow-300 to-amber-500 bg-clip-text text-transparent">
-            Premium Membership
+      {/* HEADER SECTION */}
+      <div className="relative flex flex-col items-center justify-center text-center px-10 pt-10 pb-8">
+        <div className="flex items-center justify-center gap-3">
+          <Crown className="w-8 h-8 text-yellow-500/80" />
+          <h1 className="text-3xl sm:text-4xl font-semibold text-white/95 tracking-tight">
+            Membership Plans
           </h1>
-          <p className="text-gray-400 text-sm">
-            Unlock more storage, faster speeds, and priority encryption.
-          </p>
         </div>
-      )}
 
-      {/* CARD */}
-      <div className="relative w-full max-w-md p-[2px] rounded-3xl bg-gradient-to-br from-yellow-500 via-amber-400 to-orange-500 shadow-[0_0_30px_rgba(255,215,0,0.15)]">
-        <div className="bg-[#111]/90 rounded-3xl px-8 py-10 backdrop-blur-2xl flex flex-col items-center text-center space-y-5">
-          <div className="flex items-center justify-center gap-2">
-            <Crown className="text-yellow-400 w-6 h-6" />
-            <h2 className="text-2xl font-semibold text-yellow-400">
-              Premium Plan
-            </h2>
-          </div>
+        {/* Close Button — INSIDE the rounded top corner */}
+       {onClose && (
+  <button
+    onClick={onClose}
+    className=" top-4 right-5 p-2 rounded-full 
+    bg-[#141414] border border-zinc-700/70 
+    text-gray-300 hover:text-yellow-400 hover:bg-[#1e1e1e] 
+    hover:shadow-[0_0_8px_rgba(255,215,0,0.25)] 
+    transition-all duration-300"
+    aria-label="Close"
+  >
+    <X className="w-4 h-4" />
+  </button>
+)}
 
-          <p className="text-gray-400 text-sm leading-relaxed">
-            Go beyond limits — secure more files, enjoy priority performance, and get advanced data encryption.
-          </p>
+        <p className="text-gray-400 text-sm sm:text-base max-w-md mx-auto leading-relaxed mt-3">
+          Choose the plan that fits your storage and encryption needs.
+        </p>
+      </div>
 
-          <div className="space-y-3 text-left mt-4">
-            <Feature text="100 GB of encrypted storage" />
-            <Feature text="Priority vault encryption speed" />
-            <Feature text="24/7 customer support" />
-          </div>
+      {/* PLANS GRID */}
+      <div className="px-8 pb-10 pt-4 grid md:grid-cols-2 gap-6">
+        <PlanCard
+          title="Standard Plan"
+          icon={<Shield className="w-6 h-6 text-gray-400" />}
+          description="Secure encrypted storage and essential protection features."
+          features={[
+            "30 GB of encrypted storage",
+            "Standard encryption speed",
+            "Email support during working hours",
+          ]}
+          active={user?.role === "STANDARD" || !isPremium}
+          accentColor="gray"
+          button={
+            !isPremium && (
+              <div className="mt-6 py-3 px-6 text-gray-300 border border-gray-700 rounded-xl text-sm font-medium bg-[#161616] hover:bg-[#1c1c1c] transition-all duration-300 w-full text-center">
+                Your current plan
+              </div>
+            )
+          }
+        />
 
-          {isPremium ? (
-            <div className="mt-8 py-3 px-6 bg-green-600/30 border border-green-600/60 text-green-300 rounded-xl font-medium">
-              ✅ You are already a Premium member
-            </div>
-          ) : (
-            <div className="mt-8">
-              <RazorpayButton />
-              <p className="text-xs text-gray-500 mt-3">
-                Secured payment powered by Razorpay
-              </p>
-            </div>
-          )}
-        </div>
+        <PlanCard
+          title="Premium Plan"
+          icon={<Crown className="w-6 h-6 text-yellow-500/80" />}
+          description="Faster encryption, larger storage, and priority support."
+          features={[
+            "100 GB of encrypted storage",
+            "Life-time 100 GB storage with no renewal fees",
+            "24/7 premium customer support",
+          ]}
+          active={isPremium}
+          accentColor="gold"
+          button={
+            isPremium ? (
+              <div className="mt-6 py-3 px-6 bg-emerald-600/10 border border-emerald-600/50 text-emerald-300 rounded-xl text-xs flex items-center justify-center gap-3">
+                <CheckCircle2 className="w-5 h-5" />
+                You are already a Premium member
+              </div>
+            ) : (
+              <div className="mt-6 w-full flex flex-col items-center">
+                <RazorpayButton
+                  className="w-full py-3 rounded-xl bg-white text-black font-medium text-sm hover:bg-zinc-100 active:scale-[0.98] transition-all duration-300 text-center"
+                >
+                  Upgrade to Premium
+                </RazorpayButton>
+                <p className="text-xs text-gray-500 mt-3">
+                  Secured payment powered by Razorpay
+                </p>
+              </div>
+            )
+          }
+        />
       </div>
 
       {/* FOOTER */}
-      {!compact && (
-        <div className="text-gray-500 text-xs mt-10">
-          <Lock className="inline-block w-4 h-4 mr-1" />
-          All transactions are encrypted and secure.
-        </div>
-      )}
+      <div className="border-t border-zinc-800/60 bg-[#0d0d0d] px-8 py-4 text-gray-500 text-xs flex items-center justify-center gap-1">
+        <Lock className="w-4 h-4" />
+        <span>All transactions are encrypted and secure.</span>
+      </div>
     </div>
   );
 }
 
-// ✅ Small reusable feature line
-const Feature = ({ text }) => (
-  <div className="flex items-center gap-2 text-gray-300">
-    <CheckCircle2 className="text-yellow-400 w-5 h-5" />
-    <span>{text}</span>
+/* ✅ PlanCard Component */
+const PlanCard = ({
+  title,
+  icon,
+  description,
+  features,
+  active,
+  accentColor,
+  button,
+}) => {
+  const isGold = accentColor === "gold";
+  const accentClass = isGold
+    ? "border-yellow-500/30 hover:border-yellow-400/60"
+    : "border-gray-700 hover:border-gray-600";
+
+  return (
+    <div
+      className={`bg-[#111111] border ${accentClass} rounded-2xl p-8 flex flex-col items-start 
+      transition-all duration-300 hover:-translate-y-[2px] hover:bg-[#131313] shadow-[0_0_10px_rgba(255,255,255,0.05)]`}
+    >
+      <div className="flex items-center gap-2 mb-4">
+        {icon}
+        <h2
+          className={`text-xl font-semibold ${
+            isGold ? "text-yellow-400/90" : "text-gray-200"
+          }`}
+        >
+          {title}
+        </h2>
+      </div>
+
+      <p className="text-gray-400 text-sm leading-relaxed mb-6">
+        {description}
+      </p>
+
+      <div className="space-y-3 w-full mb-4">
+        {features.map((f, i) => (
+          <Feature key={i} text={f} gold={isGold} />
+        ))}
+      </div>
+
+      {button}
+
+      {active && !button && (
+        <div className="mt-6 py-3 px-6 bg-emerald-600/20 border border-emerald-600/50 text-emerald-300 rounded-xl text-sm flex items-center justify-center gap-2">
+          <CheckCircle2 className="w-4 h-4" />
+          Current Plan
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ✅ Feature Line */
+const Feature = ({ text, gold }) => (
+  <div className="flex items-center gap-3 text-gray-300">
+    <CheckCircle2
+      className={`w-4 h-4 shrink-0 ${
+        gold ? "text-yellow-500/80" : "text-gray-500"
+      }`}
+    />
+    <span className="text-sm">{text}</span>
   </div>
 );

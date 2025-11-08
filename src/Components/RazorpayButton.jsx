@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
+import AlertCard from "./AlertCard";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function RazorpayButton() {
+  // NEW: local alert state
+  const [alert, setAlert] = useState(null);
+  const showAlert = (type, message) => setAlert({ type, message });
+
   const handlePayment = async () => {
     try {
       // ✅ Retrieve token and user info
@@ -17,7 +22,7 @@ export default function RazorpayButton() {
         "unknown_user";
 
       if (!token) {
-        alert("⚠️ Please log in again to continue with payment.");
+        showAlert("warning", "Please log in again to continue with payment.");
         return;
       }
 
@@ -75,17 +80,17 @@ export default function RazorpayButton() {
               throw new Error("Verification failed");
             }
 
-            alert("✅ Payment verified! You are now a Premium user!");
-// 👇 Optionally refresh user role in UI, but do NOT reload page
-if (window?.updateUserRole) window.updateUserRole("PREMIUM");
+            showAlert("success", "Payment verified! You are now a Premium user!");
+            // 👇 Optionally refresh user role in UI, but do NOT reload page
+            if (window?.updateUserRole) window.updateUserRole("PREMIUM");
           } catch (err) {
             console.error("❌ Payment verify failed:", err);
-            alert("❌ Payment verification failed. Please contact support.");
+            showAlert("error", "Payment verification failed. Please contact support.");
           }
         },
         modal: {
           ondismiss: function () {
-            alert("Payment cancelled.");
+            showAlert("warning", "Payment cancelled.");
           },
         },
       };
@@ -94,16 +99,26 @@ if (window?.updateUserRole) window.updateUserRole("PREMIUM");
       razorpay.open();
     } catch (err) {
       console.error("⚠️ Payment error:", err);
-      alert("⚠️ Unable to start payment. Please try again later.");
+      showAlert("error", "Unable to start payment. Please try again later.");
     }
   };
 
   return (
-    <button
-      onClick={handlePayment}
-      className="bg-white text-black font-semibold px-6 py-2 rounded-lg hover:bg-gray-200 transition-all duration-150"
-    >
-      Upgrade to Premium
-    </button>
+    <>
+      <button
+        onClick={handlePayment}
+        className="bg-white text-black font-semibold px-6 py-2 rounded-lg hover:bg-gray-200 transition-all duration-150"
+      >
+        Upgrade to Premium
+      </button>
+
+      {alert && (
+        <AlertCard
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
+      )}
+    </>
   );
 }

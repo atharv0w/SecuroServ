@@ -161,10 +161,24 @@ export default function Dashboard() {
     window.location.href = "/data-uploads";
   };
 
-  const percent =
-    storage.totalMB > 0
-      ? Math.min((storage.usedMB / storage.totalMB) * 100, 100)
-      : 0;
+ // 🧮 Dynamically calculate total storage based on role
+// Standard = 30 GB (30 × 1024 MB)
+// Premium = 100 GB (100 × 1024 MB)
+const totalMB = role === "PREMIUM" ? 1024 * 100 : 1024 * 30;
+
+// 🧩 Helper to format MB → GB automatically
+const formatStorage = (mb) => {
+  if (mb >= 1024) {
+    const gb = mb / 1024;
+    return `${gb.toFixed(2)} GB`;
+  }
+  return `${mb.toFixed(2)} MB`;
+};
+
+// 📊 Calculate percent used
+const percent =
+  totalMB > 0 ? Math.min((storage.usedMB / totalMB) * 100, 100) : 0;
+
 
   return (
     <div className="relative min-h-screen isolate overflow-hidden text-white">
@@ -183,7 +197,7 @@ export default function Dashboard() {
         {/* Greeting */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-14">
           <div className="space-y-1">
-            <h1 className="text-5xl font-semibold tracking-tight bg-gradient-to-r from-white via-gray-300 to-zinc-400 bg-clip-text text-transparent">
+            <h1 className="text-5xl font-semibold leading-[1.] tracking-tight bg-gradient-to-r from-white via-gray-300 to-zinc-400 bg-clip-text text-transparent">
               {greeting}, {user ? user.username : "User"}
             </h1>
             <p className="text-zinc-500 text-sm">
@@ -224,8 +238,9 @@ export default function Dashboard() {
                   </h3>
                 ) : (
                   <h3 className="text-3xl font-semibold mt-2 text-white/90 group-hover:text-white">
-                    {storage.usedMB.toFixed(2)} MB
+                    {formatStorage(storage.usedMB)}
                   </h3>
+
                 )}
               </div>
               <div className="size-11 grid place-items-center rounded-xl bg-gradient-to-tr from-purple-600/15 to-indigo-500/15 group-hover:from-purple-500/25 group-hover:to-indigo-500/25 transition">
@@ -239,8 +254,9 @@ export default function Dashboard() {
 
             {!storage.loading && !storage.error && (
               <p className="text-xs text-zinc-500 mt-2 text-right">
-                {storage.usedMB.toFixed(2)} / {storage.totalMB} MB
+                  {formatStorage(storage.usedMB)} / {formatStorage(totalMB)}
               </p>
+
             )}
           </FrostedCard>
 
@@ -263,44 +279,76 @@ export default function Dashboard() {
           </FrostedCard>
 
           {/* 🪙 Membership Card */}
-          <FrostedCard className="p-6 group transition-all hover:shadow-[0_0_25px_rgba(255,215,0,0.15)]">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-xs uppercase text-zinc-500/90">
-                  Membership Plan
-                </p>
-                <h3
-                  className={`text-3xl font-semibold mt-2 ${
-                    role === "PREMIUM"
-                      ? "text-yellow-400"
-                      : "text-white/90 group-hover:text-white"
-                  }`}
-                >
-                  {role === "PREMIUM" ? "Premium" : "Free"}
-                </h3>
-              </div>
-              <div className="size-11 grid place-items-center rounded-xl bg-gradient-to-tr from-yellow-500/15 to-amber-400/15 group-hover:from-yellow-500/25 group-hover:to-amber-400/25 transition">
-                <Crown className="w-5 h-5 text-yellow-400" />
-              </div>
-            </div>
+<FrostedCard
+  className={`p-6 group transition-all duration-300 rounded-2xl backdrop-blur-xl border
+    ${
+      role === "PREMIUM"
+        ? "border-yellow-500/20 bg-gradient-to-br from-[#1a1a1a]/90 to-[#0e0e0e]/90 hover:border-yellow-500/30"
+        : "border-zinc-700/40 bg-gradient-to-br from-[#111]/90 to-[#0b0b0b]/90 hover:border-zinc-600/50"
+    }
+  `}
+>
+  <div className="flex justify-between items-center">
+    <div>
+      <p className="text-xs uppercase text-zinc-500/90 tracking-wider">
+        Membership Plan
+      </p>
+      <h3
+        className={`text-3xl font-semibold mt-2 transition-colors duration-300 ${
+          role === "PREMIUM"
+            ? "text-yellow-400"
+            : "text-zinc-200 group-hover:text-white"
+        }`}
+      >
+        {role === "PREMIUM" ? "Premium" : "Standard"}
+      </h3>
+    </div>
 
-            <p className="text-xs text-zinc-500 mt-5">
-              {role === "PREMIUM"
-                ? "Enjoy unlimited secure storage and VIP support."
-                : "Upgrade to Premium for more storage and features."}
-            </p>
+    <div
+      className={`size-11 grid place-items-center rounded-xl transition-all duration-300
+        ${
+          role === "PREMIUM"
+            ? "bg-yellow-500/10 border border-yellow-500/20 group-hover:bg-yellow-500/15"
+            : "bg-zinc-800/40 border border-zinc-700/60 group-hover:bg-zinc-800/60"
+        }
+      `}
+    >
+      <Crown
+        className={`w-5 h-5 transition-colors duration-300 ${
+          role === "PREMIUM" ? "text-yellow-400" : "text-zinc-400"
+        }`}
+      />
+    </div>
+  </div>
 
-            {/* ✅ Inline render MembershipCard when clicked */}
-            <div className="mt-6">
-              <button
-                onClick={() => setShowMembership(true)}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-semibold py-2 transition-all hover:scale-[1.03] hover:shadow-[0_0_15px_rgba(255,215,0,0.3)] active:scale-[0.98]"
-              >
-                {role === "PREMIUM" ? "Manage Plan" : "View Plans"}
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </FrostedCard>
+  <p className="text-xs text-zinc-500 mt-5 leading-relaxed">
+    {role === "PREMIUM"
+      ? "Enjoy unlimited secure storage, faster encryption, and VIP support."
+      : "Upgrade to Premium for faster encryption, more storage, and priority support."}
+  </p>
+
+  <div className="mt-6">
+    <button
+      onClick={() => setShowMembership(true)}
+      className={`w-full flex items-center justify-center gap-2 rounded-xl font-semibold py-2 transition-all duration-200 active:scale-[0.98]
+        ${
+          role === "PREMIUM"
+            ? // ✅ Updated button: subtle gold accent, visible contrast
+              "bg-[#141414] border border-yellow-500/30 text-yellow-400 hover:bg-[#191919] hover:border-yellow-500/40 hover:shadow-[0_0_12px_rgba(255,215,0,0.08)]"
+            : "bg-gradient-to-r from-zinc-800 to-zinc-900 text-white border border-zinc-700 hover:shadow-[0_0_10px_rgba(255,255,255,0.05)] hover:scale-[1.02]"
+        }
+      `}
+    >
+      {role === "PREMIUM" ? "Manage Plan" : "View Plans"}
+      <ChevronRight
+        className={`w-4 h-4 ${
+          role === "PREMIUM" ? "text-yellow-400" : "text-zinc-400"
+        }`}
+      />
+    </button>
+  </div>
+</FrostedCard>
+
         </div>
 
         {/* Vault Section */}
@@ -323,14 +371,7 @@ export default function Dashboard() {
           </div>
         </FrostedCard>
 
-        {/* Footer */}
-        <div className="mt-14 text-center">
-          <p className="text-sm text-zinc-500">
-            Built with <span className="text-pink-500">♥</span> by{" "}
-            <span className="text-white/80 font-medium">SecuroServ</span> ·
-            Engineered for privacy, powered by encryption.
-          </p>
-        </div>
+        
       </div>
 
       {/* 🟡 Membership Modal */}

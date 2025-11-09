@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Crown, Lock, CheckCircle2, Shield, X } from "lucide-react";
-import RazorpayButton from "./RazorpayButton";
+import RazorpayButton from "../components/RazorpayButton";
 import { fetchMe } from "../auth";
 
-export default function MembershipCard({ onClose }) {
+export default function MembershipPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -18,7 +18,7 @@ export default function MembershipCard({ onClose }) {
 
   if (loading) {
     return (
-      <div className="min-h-[200px] flex justify-center items-center text-gray-400">
+      <div className="min-h-screen flex justify-center items-center bg-black text-gray-400 text-lg">
         Loading membership details...
       </div>
     );
@@ -27,42 +27,32 @@ export default function MembershipCard({ onClose }) {
   const isPremium = user?.role === "PREMIUM";
 
   return (
-    <div
-      className="relative w-full max-w-4xl mx-auto mt-15 mb-5
-      bg-[#0e0e0e] rounded-3xl border border-zinc-800/50 shadow-[0_0_40px_rgba(0,0,0,0.35)] 
-      overflow-visible transition-all duration-300"
-    >
-      {/* HEADER SECTION */}
-      <div className="relative flex flex-col items-center justify-center text-center px-10 pt-10 pb-8">
-        <div className="flex items-center justify-center gap-3">
+    <div className="min-h-screen bg-black flex flex-col items-center text-white px-4 sm:px-6 py-30">
+      {/* HEADER */}
+      <div className="relative w-full max-w-5xl text-center mb-10 ">
+        <div className="flex items-center justify-center gap-3 mb-2">
           <Crown className="w-8 h-8 text-yellow-500/80" />
-          <h1 className="text-3xl sm:text-4xl font-semibold text-white/95 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-white">
             Membership Plans
           </h1>
         </div>
-
-        {/* Close Button — INSIDE the rounded top corner */}
-       {onClose && (
-  <button
-    onClick={onClose}
-    className=" top-4 right-5 p-2 rounded-full 
-    bg-[#141414] border border-zinc-700/70 
-    text-gray-300 hover:text-yellow-400 hover:bg-[#1e1e1e] 
-    hover:shadow-[0_0_8px_rgba(255,215,0,0.25)] 
-    transition-all duration-300"
-    aria-label="Close"
-  >
-    <X className="w-4 h-4" />
-  </button>
-)}
-
-        <p className="text-gray-400 text-sm sm:text-base max-w-md mx-auto leading-relaxed mt-3">
-          Choose the plan that fits your storage and encryption needs.
+        <p className="text-gray-400 text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
+          Choose the plan that best fits your encrypted storage and security needs.
         </p>
+        <div className="absolute right-0 top-0 sm:right-4 sm:top-2">
+          <a
+            href="/dashboard"
+            className="inline-flex items-center justify-center p-2 rounded-full bg-[#141414] border border-zinc-700/70 
+            text-gray-300 hover:text-yellow-400 hover:bg-[#1e1e1e] 
+            hover:shadow-[0_0_8px_rgba(255,215,0,0.25)] transition-all duration-300"
+          >
+            <X className="w-4 h-4" />
+          </a>
+        </div>
       </div>
 
       {/* PLANS GRID */}
-      <div className="px-8 pb-10 pt-4 grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl mb-10">
         <PlanCard
           title="Standard Plan"
           icon={<Shield className="w-6 h-6 text-gray-400" />}
@@ -89,7 +79,7 @@ export default function MembershipCard({ onClose }) {
           description="Faster encryption, larger storage, and priority support."
           features={[
             "100 GB of encrypted storage",
-            "Life-time 100 GB storage with no renewal fees",
+            "Lifetime 100 GB storage — no renewal fees",
             "24/7 premium customer support",
           ]}
           active={isPremium}
@@ -102,9 +92,7 @@ export default function MembershipCard({ onClose }) {
               </div>
             ) : (
               <div className="mt-6 w-full flex flex-col items-center">
-                <RazorpayButton
-                  className="w-full py-3 rounded-xl bg-white text-black font-medium text-sm hover:bg-zinc-100 active:scale-[0.98] transition-all duration-300 text-center"
-                >
+                <RazorpayButton className="w-full py-3 rounded-xl bg-white text-black font-medium text-sm hover:bg-zinc-100 active:scale-[0.98] transition-all duration-300 text-center">
                   Upgrade to Premium
                 </RazorpayButton>
                 <p className="text-xs text-gray-500 mt-3">
@@ -117,7 +105,7 @@ export default function MembershipCard({ onClose }) {
       </div>
 
       {/* FOOTER */}
-      <div className="border-t border-zinc-800/60 bg-[#0d0d0d] px-8 py-4 text-gray-500 text-xs flex items-center justify-center gap-1">
+      <div className="w-full border-t border-zinc-800/60 bg-[#0d0d0d] py-0 text-gray-500 text-xs flex items-center justify-center gap-2">
         <Lock className="w-4 h-4" />
         <span>All transactions are encrypted and secure.</span>
       </div>
@@ -126,15 +114,7 @@ export default function MembershipCard({ onClose }) {
 }
 
 /* ✅ PlanCard Component */
-const PlanCard = ({
-  title,
-  icon,
-  description,
-  features,
-  active,
-  accentColor,
-  button,
-}) => {
+const PlanCard = ({ title, icon, description, features, active, accentColor, button }) => {
   const isGold = accentColor === "gold";
   const accentClass = isGold
     ? "border-yellow-500/30 hover:border-yellow-400/60"
@@ -142,13 +122,13 @@ const PlanCard = ({
 
   return (
     <div
-      className={`bg-[#111111] border ${accentClass} rounded-2xl p-8 flex flex-col items-start 
+      className={`bg-[#111111] border ${accentClass} rounded-2xl p-6 sm:p-8 flex flex-col items-start 
       transition-all duration-300 hover:-translate-y-[2px] hover:bg-[#131313] shadow-[0_0_10px_rgba(255,255,255,0.05)]`}
     >
       <div className="flex items-center gap-2 mb-4">
         {icon}
         <h2
-          className={`text-xl font-semibold ${
+          className={`text-lg sm:text-xl font-semibold ${
             isGold ? "text-yellow-400/90" : "text-gray-200"
           }`}
         >
@@ -156,9 +136,7 @@ const PlanCard = ({
         </h2>
       </div>
 
-      <p className="text-gray-400 text-sm leading-relaxed mb-6">
-        {description}
-      </p>
+      <p className="text-gray-400 text-sm leading-relaxed mb-6">{description}</p>
 
       <div className="space-y-3 w-full mb-4">
         {features.map((f, i) => (
@@ -182,9 +160,7 @@ const PlanCard = ({
 const Feature = ({ text, gold }) => (
   <div className="flex items-center gap-3 text-gray-300">
     <CheckCircle2
-      className={`w-4 h-4 shrink-0 ${
-        gold ? "text-yellow-500/80" : "text-gray-500"
-      }`}
+      className={`w-4 h-4 shrink-0 ${gold ? "text-yellow-500/80" : "text-gray-500"}`}
     />
     <span className="text-sm">{text}</span>
   </div>

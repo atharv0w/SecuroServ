@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Crown, Lock, CheckCircle2, Shield, X } from "lucide-react";
-import RazorpayButton from "../components/RazorpayButton";
+import RazorpayButton from "../Components/RazorpayButton";
 import { fetchMe } from "../auth";
 
 export default function MembershipPage() {

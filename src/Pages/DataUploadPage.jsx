@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from "react";
 import DualDragAndDrop from "../Components/DualDragAndDrop.jsx";
 import VaultGrid from "../Components/VaultGrid.jsx";
+import AlertToast from "../Components/AlertToast.jsx";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
 
 function getToken() {
   return (
@@ -15,136 +15,204 @@ function getToken() {
 }
 
 export default function FileUploadPage() {
-  const [files, setFiles] = useState([]); // file cards created from backend JSON
-  const [folders, setFolders] = useState([]); // created folders from backend
+  const [files, setFiles] = useState([]);
+  const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+    details: "",
+  });
 
-  const uploadFiles = useCallback(async (newFiles) => {
-    setError("");
-    setLoading(true);
-    try {
-      const form = new FormData();
-      newFiles.forEach((f) => form.append("files", f));
+  // ✅ Helper: Upload with progress and error detection
+  const uploadWithProgress = useCallback((url, formData) => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", url, true);
 
-      const res = await fetch(`${API_BASE}encryption/upload`, {
-        method: "POST",
-        body: form,
-        headers: {
-          "ngrok-skip-browser-warning": "true",
-          Authorization: `Bearer ${getToken()}`,
-        },
-        credentials: "include",
-      });
+      xhr.setRequestHeader("Authorization", `Bearer ${getToken()}`);
+      xhr.setRequestHeader("ngrok-skip-browser-warning", "true");
+      xhr.withCredentials = true;
 
-      if (!res.ok) {
-        const txt = await res.text().catch(() => "");
-        throw new Error(txt || "File upload failed");
-      }
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          setUploadProgress(percent);
+        }
+      };
 
-      const uploadedData = await res.json();
-      console.log("✅ [BACKEND JSON RESPONSE - files]", uploadedData);
+      xhr.onload = () => {
+  const responseText = xhr.responseText?.trim();
 
-      const uploadedFiles = Array.isArray(uploadedData) ? uploadedData : [uploadedData];
+  // Try parsing JSON
+  let data = null;
+  try {
+    data = JSON.parse(responseText);
+  } catch {
+    // not JSON — treat as plain text
+    data = responseText;
+  }
 
-      // preserve backend fields but add a few normalized ones
-      const mapped = uploadedFiles.map((it) => ({
-        ...it,
-        fileId: it.fileId || it.id || it._id || it.key,
-        name: it.name || it.filename || it.originalName || it.key || "unnamed",
-        size: it.size || it.fileSize || 0,
-        uploadedAt: it.createdAt || it.uploadedAt || new Date().toISOString(),
-      }));
+  // 🚨 Detect backend error responses
+  const isError =
+    xhr.status < 200 ||
+    xhr.status >= 300 ||
+    !data ||
+    (typeof data === "string" &&
+      /(error|failed|unauthorized|not found|login)/i.test(data)) ||
+    (data && (data.error || data.message?.toLowerCase().includes("failed")));
 
-      // add to UI once
-      setFiles((prev) => [...prev, ...mapped]);
-    } catch (e) {
-      console.error("Upload Error:", e);
-      setError("File upload failed: " + (e.message || "unknown error"));
-    } finally {
-      setLoading(false);
-    }
+  if (isError) {
+    reject(
+      new Error(
+        typeof data === "string"
+          ? data
+          : data.message || data.error || `Upload failed (${xhr.status})`
+      )
+    );
+  } else {
+    resolve(data);
+  }
+};
+
+
+      xhr.onerror = () => reject(new Error("Network error during upload"));
+      xhr.send(formData);
+    });
   }, []);
 
-  // uploadFolder expects an array of { name } or similar items from DualDragAndDrop
-  const uploadFolder = useCallback(async (filesOrItems = []) => {
-  // filesOrItems can be:
-  // - an array of File objects (when using <input webkitdirectory> or DataTransfer)
-  // - an array of objects like { file: File, relativePath: 'path/to/file' }
-  setError("");
-  setLoading(true);
+  // ✅ File Upload
+  const uploadFiles = useCallback(
+    async (newFiles) => {
+      setError("");
+      setLoading(true);
+      setUploadProgress(0);
+      try {
+        const form = new FormData();
+        newFiles.forEach((f) => form.append("files", f));
 
-  try {
-    // Normalize into array of { file, relativePath } items
-    const items = Array.from(filesOrItems).map((item) => {
-      // If item is a File (native), try to read webkitRelativePath or relativePath
-      if (item instanceof File) {
-        return {
-          file: item,
-          relativePath: item.webkitRelativePath || item.relativePath || item.name,
-        };
+        const uploadedData = await uploadWithProgress(
+          `${API_BASE}encryption/upload`,
+          form
+        );
+
+        // ✅ Check if backend actually returned valid data
+        if (!uploadedData || (Array.isArray(uploadedData) && uploadedData.length === 0)) {
+          throw new Error("No files were uploaded or invalid server response.");
+        }
+
+        const uploadedFiles = Array.isArray(uploadedData)
+          ? uploadedData
+          : [uploadedData];
+
+        const mapped = uploadedFiles.map((it) => ({
+          ...it,
+          fileId: it.fileId || it.id || it._id || it.key,
+          name: it.name || it.filename || it.originalName || it.key || "unnamed",
+          size: it.size || it.fileSize || 0,
+          uploadedAt: it.createdAt || it.uploadedAt || new Date().toISOString(),
+        }));
+
+        // Only mark as success if valid files received
+        if (mapped.length > 0 && mapped[0].fileId) {
+          setFiles((prev) => [...prev, ...mapped]);
+          setToast({
+            show: true,
+            message: "Files uploaded successfully!",
+            type: "success",
+            details: `${mapped.length} file${mapped.length > 1 ? "s" : ""} uploaded.`,
+          });
+        } else {
+          throw new Error("Server did not confirm the upload.");
+        }
+      } catch (e) {
+        console.error("Upload Error:", e);
+        setError("File upload failed: " + (e.message || "unknown error"));
+        setToast({
+          show: true,
+          message: "Upload failed",
+          type: "error",
+          details: e.message || "An unknown error occurred.",
+        });
+      } finally {
+        setLoading(false);
+        setTimeout(() => setUploadProgress(0), 800);
       }
-      // else if it's an object { file, relativePath }
-      if (item && item.file instanceof File) {
-        return {
-          file: item.file,
-          relativePath: item.relativePath || item.file.name,
+    },
+    [uploadWithProgress]
+  );
+
+  // ✅ Folder Upload
+  const uploadFolder = useCallback(
+    async (filesOrItems = []) => {
+      setError("");
+      setLoading(true);
+      setUploadProgress(0);
+
+      try {
+        const items = Array.from(filesOrItems).map((item) => {
+          if (item instanceof File) {
+            return {
+              file: item,
+              relativePath:
+                item.webkitRelativePath || item.relativePath || item.name,
+            };
+          }
+          if (item && item.file instanceof File) {
+            return {
+              file: item.file,
+              relativePath: item.relativePath || item.file.name,
+            };
+          }
+          return { file: item, relativePath: item.name || "unknown" };
+        });
+
+        const form = new FormData();
+        items.forEach((it) => form.append("file", it.file));
+        items.forEach((it) => form.append("relativePath", it.relativePath));
+
+        const created = await uploadWithProgress(
+          `${API_BASE}encryption/upload-folder`,
+          form
+        );
+
+        if (!created || created.error) {
+          throw new Error(created?.message || "Folder upload failed.");
+        }
+
+        const mappedFolder = {
+          ...created,
+          folderId: created.folderId || created.id || created._id,
+          name: created.name || created.folderName || "untitled-folder",
+          createdAt: created.createdAt || new Date().toISOString(),
         };
+        setFolders((prev) => [...prev, mappedFolder]);
+
+        setToast({
+          show: true,
+          message: "Folder uploaded successfully!",
+          type: "success",
+          details: `Folder "${mappedFolder.name}" uploaded.`,
+        });
+      } catch (err) {
+        console.error("Folder creation error:", err);
+        setError("Failed to create folder: " + (err.message || "unknown error"));
+        setToast({
+          show: true,
+          message: "Folder upload failed",
+          type: "error",
+          details: err.message || "Could not upload folder.",
+        });
+      } finally {
+        setLoading(false);
+        setTimeout(() => setUploadProgress(0), 800);
       }
-      // fallback — try to coerce
-      return {
-        file: item,
-        relativePath: (item && item.name) || "unknown",
-      };
-    });
-
-    const form = new FormData();
-
-    // Append each file under the param name "file" (server expects this)
-    for (const it of items) {
-      form.append("file", it.file);
-    }
-
-    // Append each relativePath entry under name "relativePath" (server expects this)
-    for (const it of items) {
-      form.append("relativePath", it.relativePath);
-    }
-
-    const res = await fetch(`${API_BASE}encryption/upload-folder`, {
-      method: "POST",
-      body: form, // DO NOT set Content-Type manually
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-        Authorization: `Bearer ${getToken()}`,
-        // DON'T set "Content-Type": "multipart/form-data" here
-      },
-      credentials: "include",
-    });
-
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      throw new Error(txt || `Folder creation failed (${res.status})`);
-    }
-
-    const created = await res.json();
-    console.log("✅ [BACKEND JSON RESPONSE - folder]", created);
-
-    // adapt this to whatever the backend returns: push to folders state
-    const mappedFolder = {
-      ...created,
-      folderId: created.folderId || created.id || created._id,
-      name: created.name || created.folderName || "untitled-folder",
-      createdAt: created.createdAt || new Date().toISOString(),
-    };
-    setFolders((prev) => [...prev, mappedFolder]);
-  } catch (err) {
-    console.error("Folder creation error:", err);
-    setError("Failed to create folder: " + (err.message || "unknown error"));
-  } finally {
-    setLoading(false);
-  }
-}, []);
-
+    },
+    [uploadWithProgress]
+  );
 
   return (
     <div className="min-h-screen bg-[#0b0b0b] text-zinc-200">
@@ -153,6 +221,21 @@ export default function FileUploadPage() {
           <h1 className="text-2xl font-semibold">File Uploads</h1>
         </div>
 
+        {/* 🧱 Upload Progress Bar */}
+        {loading && (
+          <div className="w-full mb-5">
+            <div className="relative w-full h-3 bg-zinc-800 rounded-full overflow-hidden">
+              <div
+                className="absolute left-0 top-0 h-full bg-emerald-500 transition-all duration-200 ease-out"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-400 mt-1 text-right">
+              Uploading... {uploadProgress}%
+            </p>
+          </div>
+        )}
+
         {error && (
           <div className="mb-4 p-4 bg-red-900/30 border border-red-700 text-red-400 rounded">
             {error}
@@ -160,8 +243,10 @@ export default function FileUploadPage() {
         )}
 
         <div className="mb-6">
-          {/* Single DualDragAndDrop with both handlers */}
-          <DualDragAndDrop onUploadFiles={uploadFiles} onUploadFolder={uploadFolder} />
+          <DualDragAndDrop
+            onUploadFiles={uploadFiles}
+            onUploadFolder={uploadFolder}
+          />
         </div>
 
         <VaultGrid
@@ -173,6 +258,15 @@ export default function FileUploadPage() {
           onFileClick={() => {}}
         />
       </div>
+
+      {/* ✅ Toast Notification */}
+      <AlertToast
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        details={toast.details}
+        onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+      />
     </div>
   );
 }

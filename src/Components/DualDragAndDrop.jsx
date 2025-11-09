@@ -200,13 +200,7 @@ export default function DualDragAndDrop({ onUploadFiles, onUploadFolder }) {
         </div>
       </div>
 
-      {/* ✅ Toast Notification */}
-      <AlertToast
-        show={toast.show}
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast({ show: false, message: "", type: "success" })}
-      />
+      
     </>
   );
 }

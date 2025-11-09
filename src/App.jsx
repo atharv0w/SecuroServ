@@ -15,7 +15,6 @@ import Features from "./Pages/Features.jsx";
 
 // Protected pages
 import Dashboard from "./Pages/Dashboard";
-import MembershipPage from "./Pages/MembershipCard.jsx";
 import FileUploadPage from "./Pages/DataUploadPage.jsx";
 import MyVault from "./Pages/MyVault.jsx";
 // Components

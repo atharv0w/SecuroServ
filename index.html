@@ -4,63 +4,89 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- 🔒 SecuroServ SEO -->
+    <!-- ===========================
+         SecuroServ — SEO & Social
+         Place these files in /public:
+         - /logo-256.png          (256x256, square, PNG)  <-- required for Google
+         - /favicon.ico           (root favicon)
+         - /favicon-32x32.png
+         - /favicon-16x16.png
+         - /apple-touch-icon.png  (180x180)
+         - /og-image.jpg          (1200x630)             <-- social preview
+         - /site.webmanifest      (optional PWA manifest)
+    ============================ -->
+
     <title>SecuroServ - Secure Vault & File Encryption Service</title>
-    <meta
-      name="description"
-      content="Protect your files with SecuroServ — a secure vault with advanced encryption and privacy-first cloud storage. Trusted, fast, and secure."
-    />
-    <meta
-      name="keywords"
-      content="Protect your files with SecuroServ — a secure local vault with AES-256-GCM encryption. Your data stays private, encrypted, and fully under your control."
-    />
+
+    <!-- Primary meta -->
+    <meta name="description" content="Protect your files with SecuroServ — a secure vault with advanced encryption and privacy-first local storage. Trusted, fast, and secure." />
+    <meta name="keywords" content="secure vault, file encryption, SecuroServ" />
     <meta name="author" content="SecuroServ Team" />
     <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://securoserv.co.in/" />
 
-    <!-- 🌐 Open Graph (for Google, Facebook, LinkedIn) -->
+    <!-- Favicons (hosted files for crawlers & browsers) -->
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <!-- optional manifest for PWA -->
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Theme color -->
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Open Graph (social preview) -->
     <meta property="og:title" content="SecuroServ - Secure Vault & File Encryption Service" />
-    <meta
-      property="og:description"
-      content="Keep your files safe with SecuroServ — a secure local vault powered by AES-256-GCM encryption. No cloud. No tracking. Full privacy."
-    />
+    <meta property="og:description" content="Keep your files safe with SecuroServ — a secure local vault. No cloud. No tracking. Full privacy." />
     <meta property="og:image" content="https://securoserv.co.in/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:url" content="https://securoserv.co.in" />
     <meta property="og:type" content="website" />
 
-    <!-- 🐦 Twitter Card -->
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="SecuroServ - Secure Vault & File Encryption Service" />
-    <meta
-      name="twitter:description"
-      content="Keep your files safe with SecuroServ — a secure local vault powered by AES-256-GCM encryption. No cloud. No tracking. Full privacy."
-    />
+    <meta name="twitter:description" content="Keep your files safe with SecuroServ — a secure local vault. No cloud. No tracking. Full privacy." />
     <meta name="twitter:image" content="https://securoserv.co.in/og-image.jpg" />
 
-    <!-- ✅ Razorpay checkout script -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Preconnect for common services (optional) -->
+    <link rel="preconnect" href="https://checkout.razorpay.com" crossorigin />
 
-    <!-- ✅ Dynamic favicon logic — dark mode → white logo, light mode → black logo -->
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1sb2NrLWljb24gbHVjaWRlLWxvY2siPjxyZWN0IHdpZHRoPSIxOCIgaGVpZ2h0PSIxMSIgeD0iMyIgeT0iMTEiIHJ4PSIyIiByeT0iMiIvPjxwYXRoIGQ9Ik03IDExVjdhNSA1IDAgMCAxIDEwIDB2NCIvPjwvc3ZnPg=="
-      id="favicon"
-    />
-    <script>
-      const whiteLogo =
-        "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1sb2NrLWljb24gbHVjaWRlLWxvY2siPjxyZWN0IHdpZHRoPSIxOCIgaGVpZ2h0PSIxMSIgeD0iMyIgeT0iMTEiIHJ4PSIyIiByeT0iMiIvPjxwYXRoIGQ9Ik03IDExVjdhNSA1IDAgMCAxIDEwIDB2NCIvPjwvc3ZnPg==";
-      const blackLogo =
-        "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0ibHVjaWRlIGx1Y2lkZS1sb2NrLWljb24gbHVjaWRlLWxvY2siPjxyZWN0IHdpZHRoPSIxOCIgaGVpZ2h0PSIxMSIgeD0iMyIgeT0iMTEiIHJ4PSIyIiByeT0iMiIvPjxwYXRoIGQ9Ik03IDExVjdhNSA1IDAgMCAxIDEwIDB2NCIvPjwvc3ZnPg==";
-      const favicon = document.getElementById("favicon");
-      const darkMode = window.matchMedia("(prefers-color-scheme: dark)");
-      const updateFavicon = (e) => (favicon.href = e.matches ? whiteLogo : blackLogo);
-      updateFavicon(darkMode);
-      darkMode.addEventListener("change", updateFavicon);
+    <!-- Razorpay checkout script (deferred) -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+
+    <!-- Organization structured data (Google logo must be a hosted HTTPS URL, not a data-URI) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "SecuroServ",
+      "url": "https://securoserv.co.in",
+      "logo": "https://securoserv.co.in/logo-256.png",
+      "sameAs": [
+        "https://twitter.com/securoserv",
+        "https://www.linkedin.com/company/securoserv"
+      ]
+    }
     </script>
-  </head>
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
+    <!-- Optional: Website schema to help site links -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": "https://securoserv.co.in",
+      "name": "SecuroServ",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://securoserv.co.in/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- Dynamic favicon logic (keeps your existing data-URI dark/light switching for UI).
+         NOTE: crawlers prefer the hosted favicon/logo above; dynamic data URIs are fine for UX only. -->
+    <link

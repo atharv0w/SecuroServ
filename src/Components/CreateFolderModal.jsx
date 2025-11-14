@@ -5,7 +5,7 @@ import { FolderPlus, X } from "lucide-react";
 export default function CreateFolderModal({ open, onClose, onCreate }) {
   const [folderName, setFolderName] = useState("");
 
-  // Close modal on Esc key
+  
   useEffect(() => {
     const handleEsc = (e) => e.key === "Escape" && onClose?.();
     window.addEventListener("keydown", handleEsc);
@@ -24,7 +24,7 @@ export default function CreateFolderModal({ open, onClose, onCreate }) {
     <AnimatePresence>
       {open && (
         <>
-          {/* === Background Overlay === */}
+         
           <motion.div
             className="fixed inset-0 bg-black/60 backdrop-blur-md z-40"
             initial={{ opacity: 0 }}
@@ -34,7 +34,7 @@ export default function CreateFolderModal({ open, onClose, onCreate }) {
             onClick={onClose}
           />
 
-          {/* === Modal === */}
+     
           <motion.div
             className="fixed z-50 top-1/2 left-1/2 w-[90%] max-w-md 
                        -translate-x-1/2 -translate-y-1/2
@@ -48,7 +48,7 @@ export default function CreateFolderModal({ open, onClose, onCreate }) {
               ease: [0.25, 0.1, 0.25, 1],
             }}
           >
-            {/* === Header === */}
+           
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <FolderPlus size={20} className="text-blue-500" />
@@ -67,7 +67,7 @@ export default function CreateFolderModal({ open, onClose, onCreate }) {
               </button>
             </div>
 
-            {/* === Input + Buttons animate in sync === */}
+         
             <motion.div
               className="flex flex-col gap-5"
               initial={{ opacity: 0, y: 40 }}

@@ -14,20 +14,20 @@ function getToken() {
   );
 }
 
-// 🧩 Apple-style minimal modal
+
 function ConfirmModal({ open, onConfirm, onCancel }) {
   return (
     <AnimatePresence>
       {open && (
         <>
-          {/* Background Overlay */}
+    
           <motion.div
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           />
-          {/* Modal */}
+  
           <motion.div
             className="fixed z-50 inset-0 flex items-center justify-center"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -65,9 +65,9 @@ export default function MyVault() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [confirmFileId, setConfirmFileId] = useState(null); // ✅ track file to delete
+  const [confirmFileId, setConfirmFileId] = useState(null); 
 
-  // Fetch all user data
+  
   const fetchAllData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -96,7 +96,7 @@ export default function MyVault() {
     fetchAllData();
   }, [fetchAllData]);
 
-  // ✅ Delete logic with modal
+  
   const deleteFile = async (fileId) => {
     try {
       const token = getToken();
@@ -114,13 +114,13 @@ export default function MyVault() {
         throw new Error(errorText || "Failed to delete file");
       }
 
-      fetchAllData(); // refresh data
+      fetchAllData(); 
     } catch (err) {
       console.error(`Error deleting file: ${err.message}`);
     }
   };
 
-  // ✅ File download handler
+  
   const download = async (url, fallbackName) => {
     try {
       const res = await fetch(url, {
@@ -157,7 +157,7 @@ export default function MyVault() {
   return (
     <div className="bg-[#0b0b0b] text-zinc-200 w-full min-h-screen overflow-y-auto">
       <div className="max-w-7xl mx-auto px-8 py-8">
-        {/* Header */}
+        
         <header className="flex items-center justify-between mb-8 sticky top-0 bg-[#0b0b0b] py-4 z-10 border-b border-gray-800">
           <h1 className="text-3xl font-semibold flex items-center gap-2 text-white">
             My Vault
@@ -172,14 +172,13 @@ export default function MyVault() {
           </button>
         </header>
 
-        {/* Error Message */}
         {error && (
           <div className="p-4 bg-red-900/30 border border-red-700 text-red-400 rounded mb-6">
             {error}
           </div>
         )}
 
-        {/* Loading State */}
+   
         {loading ? (
           <p className="text-gray-400 mt-6">Loading your vault...</p>
         ) : (
@@ -238,7 +237,7 @@ export default function MyVault() {
         )}
       </div>
 
-      {/* ✅ Custom Apple-Style Confirm Modal */}
+
       <ConfirmModal
         open={!!confirmFileId}
         onConfirm={() => {

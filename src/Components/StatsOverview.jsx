@@ -13,7 +13,7 @@ import MembershipCard from "../Components/MembershipCard";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-// ✅ Auth hook
+
 const useAuth = () => {
   const [user, setUser] = useState(null);
   useEffect(() => {
@@ -27,7 +27,7 @@ const useAuth = () => {
   return user;
 };
 
-// 🌫️ Frosted glass card with cursor-follow glow
+
 const FrostedCard = ({ children, className = "" }) => {
   const cardRef = useRef(null);
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -58,7 +58,7 @@ const FrostedCard = ({ children, className = "" }) => {
   );
 };
 
-// 🌈 Gradient progress bar
+
 const GradientProgress = ({ percent }) => (
   <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-900/50">
     <div
@@ -75,7 +75,7 @@ export default function Dashboard() {
   const [role, setRole] = useState("USER");
   const [showMembership, setShowMembership] = useState(false);
 
-  // ✅ Storage data
+  
   const [storage, setStorage] = useState({
     usedMB: 0,
     totalMB: 500,
@@ -83,7 +83,7 @@ export default function Dashboard() {
     error: "",
   });
 
-  // Greeting animation
+  
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting("Good morning");
@@ -94,7 +94,7 @@ export default function Dashboard() {
     return () => clearTimeout(timeout);
   }, []);
 
-  // ✅ Fetch storage & user role
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -105,7 +105,7 @@ export default function Dashboard() {
 
         if (!token) throw new Error("No auth token found");
 
-        // Storage API
+        
         const storageRes = await fetch(`${API_BASE}api/storage/used`, {
           method: "GET",
           headers: {
@@ -129,7 +129,7 @@ export default function Dashboard() {
           error: "",
         });
 
-        // Role API (auth/me)
+        
         const roleRes = await fetch(`${API_BASE}auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -161,12 +161,12 @@ export default function Dashboard() {
     window.location.href = "/data-uploads";
   };
 
- // 🧮 Dynamically calculate total storage based on role
-// Standard = 30 GB (30 × 1024 MB)
-// Premium = 100 GB (100 × 1024 MB)
+ 
+
+
 const totalMB = role === "PREMIUM" ? 1024 * 100 : 1024 * 30;
 
-// 🧩 Helper to format MB → GB automatically
+
 const formatStorage = (mb) => {
   if (mb >= 1024) {
     const gb = mb / 1024;
@@ -175,18 +175,17 @@ const formatStorage = (mb) => {
   return `${mb.toFixed(2)} MB`;
 };
 
-// 📊 Calculate percent used
+
 const percent =
   totalMB > 0 ? Math.min((storage.usedMB / totalMB) * 100, 100) : 0;
 
 
   return (
     <div className="relative min-h-screen isolate overflow-hidden text-white">
-      {/* Background */}
+    
       <div className="absolute inset-0 bg-[#0a0a0a]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.02)_0%,rgba(0,0,0,1)_100%)] opacity-[0.08] pointer-events-none" />
 
-      {/* Main Content */}
       <div
         className={`relative z-10 mx-auto max-w-7xl px-6 py-14 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] ${
           isLoaded
@@ -194,7 +193,7 @@ const percent =
             : "opacity-0 translate-y-10 blur-sm"
         }`}
       >
-        {/* Greeting */}
+       
         <div className="flex flex-col md:flex-row items-center justify-between mb-14">
           <div className="space-y-1">
             <h1 className="text-5xl font-semibold leading-[1.5] tracking-tight bg-gradient-to-r from-white via-gray-300 to-zinc-400 bg-clip-text text-transparent">
@@ -205,7 +204,7 @@ const percent =
             </p>
           </div>
 
-          {/* Top Right Icons */}
+       
           <div className="mt-6 md:mt-0 flex items-center gap-3">
             <div className="size-11 grid place-items-center rounded-full bg-zinc-900/60 shadow-inner hover:bg-zinc-800/70 transition-transform hover:scale-110">
               <Cpu className="w-5 h-5 text-zinc-400" />
@@ -221,9 +220,9 @@ const percent =
           </div>
         </div>
 
-        {/* Stat Cards */}
+     
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
-          {/* Storage Card */}
+    
           <FrostedCard className="p-6 group">
             <div className="flex justify-between items-center">
               <div>
@@ -260,7 +259,7 @@ const percent =
             )}
           </FrostedCard>
 
-          {/* Encryption Card */}
+  
           <FrostedCard className="p-6 group">
             <div className="flex justify-between items-center">
               <div>
@@ -278,7 +277,6 @@ const percent =
             </p>
           </FrostedCard>
 
-          {/* 🪙 Membership Card */}
 <FrostedCard
   className={`p-6 group transition-all duration-300 rounded-2xl backdrop-blur-xl border
     ${
@@ -333,7 +331,7 @@ const percent =
       className={`w-full flex items-center justify-center gap-2 rounded-xl font-semibold py-2 transition-all duration-200 active:scale-[0.98]
         ${
           role === "PREMIUM"
-            ? // ✅ Updated button: subtle gold accent, visible contrast
+            ? 
               "bg-[#141414] border border-yellow-500/30 text-yellow-400 hover:bg-[#191919] hover:border-yellow-500/40 hover:shadow-[0_0_12px_rgba(255,215,0,0.08)]"
             : "bg-gradient-to-r from-zinc-800 to-zinc-900 text-white border border-zinc-700 hover:shadow-[0_0_10px_rgba(255,255,255,0.05)] hover:scale-[1.02]"
         }
@@ -351,7 +349,6 @@ const percent =
 
         </div>
 
-        {/* Vault Section */}
         <FrostedCard className="p-12 text-center transition-all hover:scale-[1.01]">
           <div className="mx-auto max-w-md">
             <div className="mx-auto mb-8 grid size-16 place-items-center rounded-full bg-zinc-900/60 shadow-inner">
@@ -374,7 +371,7 @@ const percent =
         
       </div>
 
-      {/* 🟡 Membership Modal */}
+
       {showMembership && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="relative w-full max-w-2xl">

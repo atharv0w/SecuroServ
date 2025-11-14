@@ -9,7 +9,6 @@ const VaultGrid = ({
   onFolderClick,
   onFileClick,
 }) => {
-  // ✅ Move console.log *inside* the component
   console.log("📦 VaultGrid received:", { folders, files });
 
   if (loading) {
@@ -20,7 +19,7 @@ const VaultGrid = ({
     );
   }
 
-  // 🧩 Combine folders + files into one display list
+
   const items = [
     ...folders.map((f) => ({ ...f, type: "folder" })),
     ...files.map((f) => ({ ...f, type: "file" })),

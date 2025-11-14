@@ -4,13 +4,12 @@ import AlertCard from "./AlertCard";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function RazorpayButton() {
-  // NEW: local alert state
+  
   const [alert, setAlert] = useState(null);
   const showAlert = (type, message) => setAlert({ type, message });
 
   const handlePayment = async () => {
     try {
-      // ✅ Retrieve token and user info
       const token =
         localStorage.getItem("sv_token") ||
         localStorage.getItem("token") ||
@@ -26,14 +25,13 @@ export default function RazorpayButton() {
         return;
       }
 
-      // ✅ Create order from backend with token in Authorization header
       const orderResponse = await fetch(`${BASE_URL}payment/create-order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ amount: 100 }), // ₹1 in paise
+        body: JSON.stringify({ amount: 100 }), 
       });
 
       if (!orderResponse.ok) {
@@ -42,9 +40,9 @@ export default function RazorpayButton() {
 
       const order = await orderResponse.json();
 
-      // ✅ Razorpay checkout options
+      
       const options = {
-        key: "rzp_test_RcroVaZbZlLpxT", // 🔑 Your test key ID
+        key: "rzp_test_RcroVaZbZlLpxT", 
         amount: order.amount,
         currency: order.currency,
         name: "SecuroServ",
@@ -58,7 +56,7 @@ export default function RazorpayButton() {
         method: { upi: true },
         handler: async function (response) {
           try {
-            // ✅ Verify payment with token and payment data
+            
             const verifyResponse = await fetch(`${BASE_URL}payment/verify`, {
               method: "POST",
               headers: {
@@ -81,7 +79,7 @@ export default function RazorpayButton() {
             }
 
             showAlert("success", "Payment verified! You are now a Premium user!");
-            // 👇 Optionally refresh user role in UI, but do NOT reload page
+            
             if (window?.updateUserRole) window.updateUserRole("PREMIUM");
           } catch (err) {
             console.error("❌ Payment verify failed:", err);

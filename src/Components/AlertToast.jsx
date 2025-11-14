@@ -2,15 +2,7 @@ import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, XCircle, Info } from "lucide-react";
 
-/**
- * AlertToast (Single Instance)
- * Props:
- * - show: boolean → show/hide the toast
- * - message: string → main message
- * - type: "success" | "error" | "info" | "warning"
- * - details: string → optional small detail text
- * - onClose: function → called when auto-dismiss or user closes
- */
+
 export default function AlertToast({
   show,
   message,
@@ -25,7 +17,7 @@ export default function AlertToast({
     }
   }, [show, onClose]);
 
-  // Type-based styling and icons
+  
   const typeConfig = {
     success: {
       icon: <CheckCircle2 className="w-6 h-6 text-green-400 flex-shrink-0" />,

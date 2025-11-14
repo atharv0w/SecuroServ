@@ -51,7 +51,6 @@ export default function MembershipPage() {
         </div>
       </div>
 
-      {/* PLANS GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl mb-10">
         <PlanCard
           title="Standard Plan"
@@ -113,7 +112,7 @@ export default function MembershipPage() {
   );
 }
 
-/* ✅ PlanCard Component */
+
 const PlanCard = ({ title, icon, description, features, active, accentColor, button }) => {
   const isGold = accentColor === "gold";
   const accentClass = isGold
@@ -156,7 +155,7 @@ const PlanCard = ({ title, icon, description, features, active, accentColor, but
   );
 };
 
-/* ✅ Feature Line */
+
 const Feature = ({ text, gold }) => (
   <div className="flex items-center gap-3 text-gray-300">
     <CheckCircle2

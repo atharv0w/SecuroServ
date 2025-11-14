@@ -26,7 +26,7 @@ export default function LandingPageComponent() {
 
   return (
     <div className="relative min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 overflow-hidden">
-      {/* ✨ Ambient background gradient */}
+
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,rgba(0,0,0,1)_80%)]" />
 
       {/* Hero Section */}
@@ -88,21 +88,21 @@ export default function LandingPageComponent() {
               overflow-hidden group
             `}
           >
-            {/* 🌈 Neon Gradient Glow — appears only on hover */}
+           
             <div
               className={`absolute inset-0 rounded-[32px] opacity-0 group-hover:opacity-50 
                 transition-all duration-700 blur-3xl
                 bg-gradient-to-br ${feature.glow} mix-blend-overlay pointer-events-none`}
             ></div>
 
-            {/* ✨ Reflection Sheen */}
+  
             <div
               className="absolute inset-0 rounded-[32px] bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.1),transparent)]
               translate-x-[-100%] group-hover:translate-x-[100%]
               transition-transform duration-[1200ms] ease-in-out"
             ></div>
 
-            {/* 🌫 Frost Layer */}
+          
             <div className="absolute inset-0 rounded-[32px] bg-gradient-to-b from-white/10 to-transparent opacity-10 pointer-events-none" />
 
             {feature.icon}

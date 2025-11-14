@@ -129,7 +129,7 @@ export default function Sidebar({ collapsed = false, onToggle, onLogout }) {
   );
 }
 
-/* === SidebarLink === */
+
 function SidebarLink({ to, icon, label, collapsed }) {
   return (
     <NavLink
@@ -152,7 +152,7 @@ function SidebarLink({ to, icon, label, collapsed }) {
   );
 }
 
-/* === Glass Animation CSS === */
+
 const style = document.createElement("style");
 style.innerHTML = `
   @keyframes sidebarShine {

@@ -4,13 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, XCircle, AlertTriangle, Info } from "lucide-react";
 
 export default function AlertCard({ type = "info", message, onClose }) {
-  // Auto close after 3 seconds
+  
   useEffect(() => {
     const timer = setTimeout(() => onClose?.(), 3000);
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  // Icon mapping
+  
   const icons = {
     success: <CheckCircle2 className="w-5 h-5 text-emerald-400" />,
     error: <XCircle className="w-5 h-5 text-red-400" />,
@@ -18,7 +18,7 @@ export default function AlertCard({ type = "info", message, onClose }) {
     info: <Info className="w-5 h-5 text-blue-400" />,
   };
 
-  // Color mapping
+  
   const accent = {
     success: "border-emerald-600/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]",
     error: "border-red-600/40 shadow-[0_0_15px_rgba(239,68,68,0.2)]",
@@ -26,7 +26,7 @@ export default function AlertCard({ type = "info", message, onClose }) {
     info: "border-blue-600/40 shadow-[0_0_15px_rgba(59,130,246,0.2)]",
   };
 
-  // Portal ensures it appears outside any parent stacking context
+  
   return createPortal(
     <AnimatePresence>
       {message && (
@@ -45,7 +45,7 @@ export default function AlertCard({ type = "info", message, onClose }) {
           {icons[type]}
           <span className="text-sm font-medium">{message}</span>
 
-          {/* Optional manual close button */}
+         
           <button
             onClick={onClose}
             className="ml-3 text-gray-400 hover:text-gray-200 transition-colors"

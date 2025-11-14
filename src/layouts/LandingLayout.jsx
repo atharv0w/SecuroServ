@@ -8,7 +8,7 @@ export default function LandingLayout() {
     <div className="min-h-screen flex flex-col bg-black text-white">
       <LandingNavbar />
       <main className="flex-1 pt-20">
-        <Outlet /> {/* ✅ This is essential — keeps ContactUs visible */}
+        <Outlet /> 
       </main>
       <Footer />
     </div>

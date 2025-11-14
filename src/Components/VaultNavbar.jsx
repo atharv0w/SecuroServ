@@ -1,4 +1,4 @@
-// src/Components/VaultNavbar.jsx
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LayoutDashboard } from "lucide-react";
@@ -58,8 +58,8 @@ async function fetchStorageFromAPI(role) {
   const data = await res.json();
   const usedMB = Number(data?.usedMB ?? 0);
 
-  // 🧮 Dynamic total based on role
-  const maxStorageMB = role === "PREMIUM" ? 1024 * 100 : 1024 * 30; // Premium = 100GB, Standard = 30GB
+  
+  const maxStorageMB = role === "PREMIUM" ? 1024 * 100 : 1024 * 30; 
 
   return {
     usedStorage: usedMB,
@@ -67,7 +67,7 @@ async function fetchStorageFromAPI(role) {
   };
 }
 
-// 🧩 Helper: format MB/GB nicely
+
 function formatStorage(mb) {
   if (mb >= 1024) {
     const gb = mb / 1024;
@@ -102,11 +102,11 @@ const VaultNavbar = () => {
       if (mounted.current)
         setStorageData((s) => ({ ...s, loading: true, error: "" }));
 
-      // Fetch role first
+      
       const userRole = await fetchRoleFromAPI();
       setRole(userRole);
 
-      // Then fetch storage info
+      
       const info = await fetchStorageFromAPI(userRole);
 
       if (mounted.current)
@@ -140,7 +140,7 @@ const VaultNavbar = () => {
         bg-[#121212] space-y-3 md:space-y-0
       "
     >
-      {/* Left: Dashboard Button */}
+   
       <button
         onClick={() => navigate('/dashboard')}
         className="
@@ -154,7 +154,6 @@ const VaultNavbar = () => {
         <span className="hidden sm:inline">Dashboard</span>
       </button>
 
-      {/* Right: Storage Info */}
       <div
         className="
           flex flex-col sm:flex-row items-center gap-2 sm:gap-3

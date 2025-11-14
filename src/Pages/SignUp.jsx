@@ -2,7 +2,6 @@ import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import { Eye, EyeOff, AlertCircle, Loader2, Mail, Shield } from 'lucide-react';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// ===== Utils
 const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email) && email.length <= 254;
@@ -22,16 +21,16 @@ const validatePassword = (password) => {
   return { checks, score, isValid: score >= 6 };
 };
 
-// NEW: username validator
+
 const validateUsername = (username) => {
-  // 3–20, start with letter, letters/numbers/._-, no spaces, not all digits
+  
   if (!username) return false;
   if (!/^[A-Za-z][A-Za-z0-9._-]{2,19}$/.test(username)) return false;
   if (/^\d+$/.test(username)) return false;
   return true;
 };
 
-// ===== Password strength
+
 const PasswordStrength = ({ password }) => {
   const validation = useMemo(() => validatePassword(password), [password]);
   const strengthConfig = {
@@ -72,7 +71,7 @@ const PasswordStrength = ({ password }) => {
   );
 };
 
-// ===== OTP Input
+
 const OTPInput = ({ otp, setOtp, error }) => {
   const inputRefs = useRef([]);
   const handleChange = (value, index) => {
@@ -117,7 +116,7 @@ const OTPInput = ({ otp, setOtp, error }) => {
   );
 };
 
-// ===== Main
+
 export default function VaultSignUpPage({
   onSuccess,
   onError,
@@ -186,7 +185,7 @@ export default function VaultSignUpPage({
 
   const progressWidth = ((step - 1) / 1) * 100;
 
-  // Step 1 submit
+  
   const handleSubmitStep1 = async () => {
     setTouched({ email: true, username: true, password: true, confirmPassword: true });
     if (!isStep1Valid) {
@@ -199,7 +198,7 @@ export default function VaultSignUpPage({
     try {
       const payload = {
         email: formData.email.trim(),
-        username: formData.username.trim(), // <-- added
+        username: formData.username.trim(), 
         password: formData.password,
       };
 
@@ -299,7 +298,7 @@ export default function VaultSignUpPage({
             'Accept': '*/*',
           },
           body: JSON.stringify({ otp: otp.join('') }),
-          // remove credentials unless your server explicitly needs them with CORS set correctly
+          
         }
       );
 
@@ -311,7 +310,7 @@ export default function VaultSignUpPage({
         token = data?.accessToken || data?.token || '';
       } else {
         const raw = await response.text();
-        token = (raw || '').trim().replace(/^"(.*)"$/, '$1'); // handle quoted string
+        token = (raw || '').trim().replace(/^"(.*)"$/, '$1'); 
       }
 
       if (!response.ok) {
@@ -343,13 +342,11 @@ window.location.href = "/dashboard";
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-6">
       <div className="w-full max-w-md bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl shadow-black/50 p-8">
-        {/* Brand */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <Shield className="w-7 h-7 text-white" />
           <span className="text-2xl font-bold text-white">SecuroServ</span>
         </div>
 
-        {/* Progress */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-3">
             <span className="text-xs font-medium text-zinc-500">Step {step} of 2</span>
@@ -360,7 +357,6 @@ window.location.href = "/dashboard";
           </div>
         </div>
 
-        {/* Step 1 */}
         {step === 1 && (
           <div className="space-y-5">
             <div className="text-center mb-6">
@@ -368,7 +364,6 @@ window.location.href = "/dashboard";
               <p className="text-sm text-zinc-500">Use a strong Master Password. We cannot reset it.</p>
             </div>
 
-            {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-zinc-400 mb-2">
                 Email Address
@@ -393,7 +388,6 @@ window.location.href = "/dashboard";
               )}
             </div>
 
-            {/* Username — NEW */}
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-zinc-400 mb-2">
                 Username
@@ -419,7 +413,6 @@ window.location.href = "/dashboard";
               )}
             </div>
 
-            {/* Master Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-zinc-400 mb-2">
                 Master Password
@@ -457,7 +450,6 @@ window.location.href = "/dashboard";
               )}
             </div>
 
-            {/* Confirm */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-zinc-400 mb-2">
                 Confirm Master Password
@@ -492,7 +484,6 @@ window.location.href = "/dashboard";
               )}
             </div>
 
-            {/* Error */}
             {submitError && (
               <div className="p-3 bg-red-950/30 border border-red-900/50 rounded-lg">
                 <p className="text-xs text-red-400 flex items-center gap-2">
@@ -525,7 +516,7 @@ window.location.href = "/dashboard";
           </div>
         )}
 
-        {/* Step 2 */}
+   
         {step === 2 && (
           <div className="space-y-6">
             <div className="text-center mb-6">
@@ -588,7 +579,7 @@ window.location.href = "/dashboard";
           </div>
         )}
 
-        {/* Footer */}
+     
         <div className="mt-8 text-center border-t border-zinc-900 pt-6">
           <p className="text-xs text-zinc-500">
             Already have a account?{' '}

@@ -4,20 +4,20 @@ import { FileText, Folder, Download } from "lucide-react";
 const FileCard = ({ item, onClick, onDownload }) => {
   const isFile = item.type === "file";
 
-  // 🧩 Safely format date
+  
   const formattedDate = item.creationAT
     ? new Date(item.creationAT).toLocaleString()
     : "Unknown date";
 
-  // 🧩 Handle click — folder or file
+  
   const handleClick = () => {
-    if (!isFile && onClick) onClick(item); // navigate into folder
+    if (!isFile && onClick) onClick(item); 
   };
 
-  // 🧩 Handle download
+  
   const handleDownload = (e) => {
     e.stopPropagation();
-    if (onDownload) onDownload(item); // pass full item object
+    if (onDownload) onDownload(item); 
   };
 
   return (

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
 import { Upload, FolderPlus } from "lucide-react";
-import AlertToast from "./AlertToast.jsx"; // ✅ Toast component
+import AlertToast from "./AlertToast.jsx"; 
 
 export default function DualDragAndDrop({ onUploadFiles, onUploadFolder }) {
   const [isOverFolder, setIsOverFolder] = useState(false);
@@ -8,7 +8,7 @@ export default function DualDragAndDrop({ onUploadFiles, onUploadFolder }) {
   const folderInputRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // ✅ Toast State
+  
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   const showToast = (message, type = "success") => {
@@ -16,7 +16,7 @@ export default function DualDragAndDrop({ onUploadFiles, onUploadFolder }) {
     setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
   };
 
-  /* === Folder Upload === */
+ 
   const handleFolderUpload = async (files) => {
     if (!files.length) return;
 
@@ -32,7 +32,7 @@ export default function DualDragAndDrop({ onUploadFiles, onUploadFolder }) {
     }
   };
 
-  /* === File Upload === */
+ 
   const handleFileUpload = async (files) => {
     if (!files.length) return;
 
@@ -48,7 +48,7 @@ export default function DualDragAndDrop({ onUploadFiles, onUploadFolder }) {
     }
   };
 
-  /* === Drag and Drop === */
+ 
   const handleDragOver = useCallback((e, type) => {
     e.preventDefault();
     e.stopPropagation();
@@ -71,14 +71,14 @@ export default function DualDragAndDrop({ onUploadFiles, onUploadFolder }) {
       const items = e.dataTransfer.items;
       if (!items?.length) return;
 
-      // ✅ Handle files dropped (simple)
+      
       if (type === "file") {
         const droppedFiles = Array.from(e.dataTransfer.files);
         console.log("📦 Files dropped:", droppedFiles);
         handleFileUpload(droppedFiles);
       }
 
-      // ✅ Handle folders dropped (webkit-specific)
+      
       if (type === "folder") {
         const files = [];
         const traverseFileTree = (item, path = "") => {
@@ -125,7 +125,7 @@ export default function DualDragAndDrop({ onUploadFiles, onUploadFolder }) {
           e.stopPropagation();
         }}
       >
-        {/* ===== Folder Upload Box ===== */}
+        
         <div
           onDragOver={(e) => handleDragOver(e, "folder")}
           onDragLeave={(e) => handleDragLeave(e, "folder")}
@@ -163,7 +163,6 @@ export default function DualDragAndDrop({ onUploadFiles, onUploadFolder }) {
           </div>
         </div>
 
-        {/* ===== File Upload Box ===== */}
         <div
           onDragOver={(e) => handleDragOver(e, "file")}
           onDragLeave={(e) => handleDragLeave(e, "file")}

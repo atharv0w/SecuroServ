@@ -1,4 +1,4 @@
-// src/Components/LandingNavbar.jsx
+
 import React, { useState, useRef, useEffect } from "react";
 import { Lock, LogIn, UserPlus, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -7,7 +7,7 @@ const LandingNavbar = () => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
 
-  // close mobile menu when clicking outside
+  
   useEffect(() => {
     function onDocClick(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
@@ -20,18 +20,18 @@ const LandingNavbar = () => {
     <nav className="bg-zinc-900 border-b border-zinc-800 fixed w-full top-0 z-50">
       <div className="w-full px-4 sm:px-6">
         <div className="flex justify-between items-center py-2 sm:py-4">
-          {/* Logo */}
+        
           <Link
             to="/"
             className="flex items-center gap-2 text-white text-lg sm:text-2xl font-semibold hover:opacity-90 transition"
             aria-label="SecuroServ home"
           >
             <Lock size={22} />
-            {/* hide long text on very small screens to preserve space */}
+           
             <span className="truncate max-w-[130px] sm:max-w-none">SecuroServ</span>
           </Link>
 
-          {/* Desktop / tablet buttons */}
+       
           <div className="hidden md:flex items-center gap-3">
             <Link
               to="/login"
@@ -50,9 +50,9 @@ const LandingNavbar = () => {
             </Link>
           </div>
 
-          {/* Small screens: compact icon buttons + hamburger */}
+        
           <div className="flex items-center gap-2 md:hidden">
-            {/* icon-only quick links (keeps UI compact) */}
+          
             <Link
               to="/login"
               className="flex items-center justify-center p-2 rounded-md border border-zinc-700 bg-transparent text-gray-200 hover:bg-zinc-800 transition"
@@ -69,7 +69,6 @@ const LandingNavbar = () => {
               <UserPlus size={18} />
             </Link>
 
-            {/* mobile menu toggle */}
             <button
               onClick={() => setOpen((s) => !s)}
               aria-expanded={open}
@@ -82,7 +81,7 @@ const LandingNavbar = () => {
         </div>
       </div>
 
-      {/* Mobile dropdown: appears under the navbar on small screens */}
+
       {open && (
         <div
           ref={menuRef}

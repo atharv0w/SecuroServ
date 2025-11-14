@@ -1,32 +1,24 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Lenis from "@studio-freight/lenis";
-
-// Layouts
 import LandingLayout from "./layouts/LandingLayout.jsx";
 import MainLayout from "./layouts/MainLayout.jsx";
-
-// Public pages
 import LandingPage from "./Pages/LandingPage";
 import Login from "./Pages/Login.jsx";
 import Signup from "./Pages/SignUp.jsx";
 import ContactUs from "./Pages/ContactUs.jsx";
 import Features from "./Pages/Features.jsx";
-
-// Protected pages
 import Dashboard from "./Pages/Dashboard";
 import FileUploadPage from "./Pages/DataUploadPage.jsx";
 import MyVault from "./Pages/MyVault.jsx";
-// Components
 import ProtectedRoute from "./Components/ProtectedRoute.jsx";
 import { sanitizeAuthStorage } from "./auth.jsx";
-
 
 
 export default function App() {
   sanitizeAuthStorage();
 
-  // 🚫 Prevent browser's default file upload prompt on drag/drop
+  
   useEffect(() => {
     const preventDefaultDrop = (e) => {
       e.preventDefault();
@@ -42,7 +34,7 @@ export default function App() {
     };
   }, []);
 
-  // 🌪️ Lenis Smooth Scroll Initialization (single instance)
+  
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
@@ -65,13 +57,11 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <Routes>
-        {/* 🌐 Public Routes */}
         <Route element={<LandingLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/features" element={<Features />} />
 
-          {/* 🔑 Auth Routes */}
           <Route
             path="/login"
             element={
@@ -90,7 +80,6 @@ export default function App() {
           />
         </Route>
 
-        {/* 🔐 Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -113,14 +102,14 @@ export default function App() {
           <Route path="/myVault" element={< MyVault/>} />
         </Route>
 
-        {/* 🚫 Fallback route */}
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
 }
 
-/* 🔁 AuthRedirect — Prevent logged-in users from seeing login/signup again */
+
 function AuthRedirect({ children }) {
   const token = localStorage.getItem("sv_token");
 
@@ -139,12 +128,12 @@ function AuthRedirect({ children }) {
   return children;
 }
 
-/* 🔝 ScrollToTop — Works perfectly with Lenis */
+
 function ScrollToTop() {
   const location = useLocation();
 
   useEffect(() => {
-    // Use native scrollTo, Lenis automatically syncs
+    
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [location]);
 

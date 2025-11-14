@@ -34,7 +34,6 @@ const Features = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-[#e0e0e0] font-[Poppins] pb-24 overflow-x-hidden">
-      {/* HERO */}
       <section className="max-w-6xl mx-auto px-6 pt-32 pb-24 text-center">
         <motion.div
           variants={fadeIn}
@@ -77,14 +76,11 @@ Every detail is intentional — nothing more, nothing less.
         </motion.p>
       </section>
 
-      {/* FEATURE LIST */}
       <div className="max-w-6xl mx-auto px-6 space-y-32">
         {features.map((f, i) => (
           <FeatureRow key={i} {...f} delay={i * 0.15} />
         ))}
       </div>
-
-      {/* CALL TO ACTION */}
       <motion.section
         variants={fadeIn}
         initial="hidden"
@@ -118,7 +114,6 @@ Every detail is intentional — nothing more, nothing less.
   );
 };
 
-// 🧩 Feature Data
 const features = [
   {
     title: "SecuroServ Private Vault Storage",
@@ -169,19 +164,15 @@ const features = [
   },
 ];
 
-// 🧱 Feature Row (Optimized: Parallax, Mouse Light, Line Drawing, Reflection)
 const FeatureRow = ({ title, desc, detail, icon, direction = "normal", delay = 0 }) => {
   const isReverse = direction === "reverse";
   const ref = useRef(null);
   const cardRef = useRef(null);
-
-  // Parallax with smoothing
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
 
-  // 🪄 Use spring damping to smooth motion updates
   const y = useSpring(useTransform(scrollYProgress, [0, 1], [40, -40]), {
     stiffness: 60,
     damping: 20,
@@ -195,7 +186,6 @@ const FeatureRow = ({ title, desc, detail, icon, direction = "normal", delay = 0
     damping: 18,
   });
 
-  // 🖱️ Mouse-based tilt and light tracking
   const handleMouseMove = (e) => {
     const card = cardRef.current;
     if (!card) return;
@@ -235,7 +225,7 @@ const FeatureRow = ({ title, desc, detail, icon, direction = "normal", delay = 0
         isReverse ? "md:flex-row-reverse" : "md:flex-row"
       } items-center gap-16 will-change-transform`}
     >
-      {/* TEXT SIDE */}
+
       <div className="flex-1 space-y-5">
         <div className="flex items-center gap-4">
           <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.05] shadow-inner backdrop-blur-md">
@@ -247,23 +237,18 @@ const FeatureRow = ({ title, desc, detail, icon, direction = "normal", delay = 0
         <p className="text-gray-500 text-sm">{detail}</p>
       </div>
 
-      {/* VISUAL SIDE */}
       <motion.div
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         className="flex-1 relative rounded-2xl bg-gradient-to-b from-white/[0.03] to-transparent border border-white/[0.07] shadow-2xl backdrop-blur-xl overflow-hidden group h-56 flex items-center justify-center transition-transform duration-200 ease-out will-change-transform transform-gpu"
       >
-        {/* Reflection sweep */}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-[2000ms] pointer-events-none will-change-transform"></div>
 
-        {/* Static lighting layer */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,#ffffff10,transparent_60%)] opacity-40 pointer-events-none"></div>
 
-        {/* Mouse-follow light */}
         <div className="mouse-light absolute w-44 h-44 bg-white/[0.05] rounded-full blur-3xl pointer-events-none transition-transform duration-100 ease-out -translate-x-1/2 -translate-y-1/2"></div>
 
-        {/* Animated SVG (custom per feature) */}
         {title === "SecuroServ Private Vault Storage" && <ServerFlowSvg />}
         {title === "Hierarchical Encryption" && <LockRingsSvg />}
         {title === "Backend Encryption Pipeline" && <PipelineSvg />}
@@ -272,15 +257,13 @@ const FeatureRow = ({ title, desc, detail, icon, direction = "normal", delay = 0
         {title === "Activity & Audit Tracking" && <ActivitySvg />}
 
 
-        {/* Label */}
+  
       
       </motion.div>
     </motion.section>
   );
 };
 
-
-// ✏️ Animated Line-Drawing SVG
 const AnimatedSvg = () => {
   const pathVariants = {
     hidden: { pathLength: 0, opacity: 0 },
@@ -331,9 +314,9 @@ const ServerFlowSvg = () => {
         whileInView="visible"
         viewport={{ once: false, amount: 0.4 }}
       >
-        {/* === Data transmission line (self-erasing) === */}
+ 
         <motion.line
-          x1="105" // shifted from 90 → 105 for cleaner gap
+          x1="105" 
           y1="70"
           x2="210"
           y2="70"
@@ -355,8 +338,6 @@ const ServerFlowSvg = () => {
             repeat: Infinity,
           }}
         />
-
-        {/* === Moving FileUp icon === */}
         <motion.g
           initial={{ opacity: 0, x: 210, y: 55 }}
           animate={{
@@ -378,7 +359,6 @@ const ServerFlowSvg = () => {
           />
         </motion.g>
 
-        {/* === Static DatabaseZap icon (with pulse) === */}
         <g transform="translate(50,42)">
           <motion.g
             animate={{
@@ -414,7 +394,7 @@ const LockRingsSvg = () => {
         whileInView="visible"
         viewport={{ once: false, amount: 0.4 }}
       >
-        {/* === Concentric Pulsing Rings (inner synced with lock) === */}
+   
         {[45, 75, 105].map((radius, i) => (
           <motion.circle
             key={i}
@@ -433,12 +413,12 @@ const LockRingsSvg = () => {
               duration: 3.2 + i * 0.5,
               ease: [0.45, 0.05, 0.55, 0.95],
               repeat: Infinity,
-              delay: i === 0 ? 0 : i * 0.5, // Inner ring synced, others slightly delayed
+              delay: i === 0 ? 0 : i * 0.5,
             }}
           />
         ))}
 
-        {/* === Central Lock synced with inner ring === */}
+       
         <motion.g
           animate={{
             scale: [1, 1.12, 1],
@@ -460,7 +440,7 @@ const LockRingsSvg = () => {
           />
         </motion.g>
 
-        {/* === Ambient outer glow === */}
+
         <motion.circle
           cx="150"
           cy="150"
@@ -493,7 +473,7 @@ const PipelineSvg = () => {
         whileInView="visible"
         viewport={{ once: false, amount: 0.4 }}
       >
-        {/* === Concentric Pulsing Rings (inner synced with lock) === */}
+        
         {[45, 75, 105].map((radius, i) => (
           <motion.circle
             key={i}
@@ -512,12 +492,12 @@ const PipelineSvg = () => {
               duration: 3.2 + i * 0.5,
               ease: [0.45, 0.05, 0.55, 0.95],
               repeat: Infinity,
-              delay: i === 0 ? 0 : i * 0.5, // Inner ring synced, others slightly delayed
+              delay: i === 0 ? 0 : i * 0.5, 
             }}
           />
         ))}
 
-        {/* === Central Lock synced with inner ring === */}
+       
         <motion.g
           animate={{
             scale: [1, 1.12, 1],
@@ -539,7 +519,7 @@ const PipelineSvg = () => {
           />
         </motion.g>
 
-        {/* === Ambient outer glow === */}
+        
         <motion.circle
           cx="150"
           cy="150"
@@ -572,7 +552,7 @@ const CompressionSvg = () => {
         whileInView="visible"
         viewport={{ once: false, amount: 0.4 }}
       >
-        {/* === Connecting line (now stops before icons) === */}
+       
         <motion.line
           x1="130"
           y1="80"
@@ -595,7 +575,7 @@ const CompressionSvg = () => {
           }}
         />
 
-        {/* === Compression bars (inward squeeze) === */}
+      
         {[...Array(4)].map((_, i) => (
           <motion.rect
             key={i}
@@ -619,7 +599,7 @@ const CompressionSvg = () => {
           />
         ))}
 
-        {/* === File Icon (Original) === */}
+       
         <motion.g
           animate={{
             scale: [1, 1.05, 1],
@@ -641,7 +621,6 @@ const CompressionSvg = () => {
           />
         </motion.g>
 
-        {/* === Compressed Output (Box) === */}
         <motion.g
           animate={{
             scale: [0.8, 1.1, 0.8],
@@ -664,7 +643,6 @@ const CompressionSvg = () => {
           />
         </motion.g>
 
-        {/* === Flowing Particle (Data) === */}
         <motion.circle
           cx="130"
           cy="80"
@@ -696,7 +674,7 @@ const PrivateVaultSvg = () => {
         whileInView="visible"
         viewport={{ once: false, amount: 0.4 }}
       >
-        {/* === Outer Glow Ripple === */}
+    
         <motion.circle
           cx="150"
           cy="150"
@@ -715,7 +693,7 @@ const PrivateVaultSvg = () => {
           }}
         />
 
-        {/* === Rotating Orbit Rings + Moving Nodes === */}
+        
         {[50, 78, 105].map((radius, i) => (
           <motion.g
             key={i}
@@ -727,7 +705,7 @@ const PrivateVaultSvg = () => {
             }}
             style={{ transformOrigin: "center" }}
           >
-            {/* Ring itself */}
+    
             <circle
               cx="150"
               cy="150"
@@ -737,7 +715,6 @@ const PrivateVaultSvg = () => {
               fill="none"
             />
 
-            {/* Orbiting nodes (4 evenly spaced) */}
             {[...Array(4)].map((_, j) => {
               const angle = (j * 90 * Math.PI) / 180;
               const x = 150 + radius * Math.cos(angle);
@@ -765,7 +742,7 @@ const PrivateVaultSvg = () => {
           </motion.g>
         ))}
 
-        {/* === Central Shield Lock (Vault Core) === */}
+
         <motion.g
           animate={{
             scale: [1, 1.05, 1],
@@ -788,7 +765,6 @@ const PrivateVaultSvg = () => {
           />
         </motion.g>
 
-        {/* === Inner Glow Pulse === */}
         <motion.circle
           cx="150"
           cy="150"
@@ -821,7 +797,6 @@ const ActivitySvg = () => {
         whileInView="visible"
         viewport={{ once: false, amount: 0.4 }}
       >
-        {/* === Inner Static Ring === */}
         <circle
           cx="150"
           cy="150"
@@ -831,7 +806,6 @@ const ActivitySvg = () => {
           fill="none"
         />
 
-        {/* === Middle Ring (Reverse Rotation for Depth) === */}
         <motion.g
           animate={{ rotate: [0, -360] }}
           transition={{
@@ -865,7 +839,6 @@ const ActivitySvg = () => {
           })}
         </motion.g>
 
-        {/* === Outermost Rotating Ring (Main Orbit) === */}
         <motion.g
           animate={{ rotate: [0, 360] }}
           transition={{
@@ -899,8 +872,6 @@ const ActivitySvg = () => {
             );
           })}
         </motion.g>
-
-        {/* === Connection Pulses (Softened Lines) === */}
         {[0, 60, 120, 180, 240, 300].map((angle, i) => {
           const length = 60;
           const x1 = 150 + Math.cos((angle * Math.PI) / 180) * 25;
@@ -914,7 +885,7 @@ const ActivitySvg = () => {
               y1={y1}
               x2={x2}
               y2={y2}
-              stroke="rgba(255,255,255,0.18)" // ← softened from 0.3 to 0.18
+              stroke="rgba(255,255,255,0.18)" 
               strokeWidth="0.9"
               strokeLinecap="round"
               initial={{ pathLength: 0, opacity: 0 }}
@@ -929,7 +900,6 @@ const ActivitySvg = () => {
           );
         })}
 
-        {/* === Central Activity Icon (Breathing Core) === */}
         <motion.g
           animate={{
             scale: [1, 1.1, 1],
@@ -951,7 +921,6 @@ const ActivitySvg = () => {
           />
         </motion.g>
 
-        {/* === Center Glow Pulse === */}
         <motion.circle
           cx="150"
           cy="150"
@@ -970,7 +939,6 @@ const ActivitySvg = () => {
           }}
         />
 
-        {/* === Ambient Outer Halo === */}
         <motion.circle
           cx="150"
           cy="150"

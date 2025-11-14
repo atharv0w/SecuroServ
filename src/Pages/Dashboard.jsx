@@ -18,10 +18,8 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
-      {/* Navbar */}
       <DashNavbar />
 
-      {/* Scrollable Section */}
       <main className="flex-1 overflow-y-auto px-0 py-0">
         <StatsOverview />
 
@@ -31,7 +29,6 @@ export default function Dashboard() {
               Logged in as <strong>{user.username || user.email}</strong>
             </p>
 
-            {/* ✅ Show Upgrade button if user is not premium */}
           
           </div>
         )}

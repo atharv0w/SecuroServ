@@ -27,7 +27,7 @@ export default function FileUploadPage() {
     details: "",
   });
 
-  // ✅ Helper: Upload with progress and error detection
+  
   const uploadWithProgress = useCallback((url, formData) => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
@@ -47,16 +47,15 @@ export default function FileUploadPage() {
       xhr.onload = () => {
   const responseText = xhr.responseText?.trim();
 
-  // Try parsing JSON
+
   let data = null;
   try {
     data = JSON.parse(responseText);
   } catch {
-    // not JSON — treat as plain text
+    
     data = responseText;
   }
-
-  // 🚨 Detect backend error responses
+  
   const isError =
     xhr.status < 200 ||
     xhr.status >= 300 ||
@@ -84,7 +83,7 @@ export default function FileUploadPage() {
     });
   }, []);
 
-  // ✅ File Upload
+  
   const uploadFiles = useCallback(
     async (newFiles) => {
       setError("");
@@ -99,7 +98,7 @@ export default function FileUploadPage() {
           form
         );
 
-        // ✅ Check if backend actually returned valid data
+        
         if (!uploadedData || (Array.isArray(uploadedData) && uploadedData.length === 0)) {
           throw new Error("No files were uploaded or invalid server response.");
         }
@@ -116,7 +115,7 @@ export default function FileUploadPage() {
           uploadedAt: it.createdAt || it.uploadedAt || new Date().toISOString(),
         }));
 
-        // Only mark as success if valid files received
+        
         if (mapped.length > 0 && mapped[0].fileId) {
           setFiles((prev) => [...prev, ...mapped]);
           setToast({
@@ -145,7 +144,7 @@ export default function FileUploadPage() {
     [uploadWithProgress]
   );
 
-  // ✅ Folder Upload
+  
   const uploadFolder = useCallback(
     async (filesOrItems = []) => {
       setError("");
@@ -221,7 +220,6 @@ export default function FileUploadPage() {
           <h1 className="text-2xl font-semibold">File Uploads</h1>
         </div>
 
-        {/* 🧱 Upload Progress Bar */}
         {loading && (
           <div className="w-full mb-5">
             <div className="relative w-full h-3 bg-zinc-800 rounded-full overflow-hidden">
@@ -259,7 +257,6 @@ export default function FileUploadPage() {
         />
       </div>
 
-      {/* ✅ Toast Notification */}
       <AlertToast
         show={toast.show}
         message={toast.message}

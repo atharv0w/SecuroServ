@@ -4,13 +4,13 @@ import { Eye, EyeOff, AlertCircle, Shield, Loader2 } from "lucide-react";
 import { setAuth, fetchMe } from "../auth";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// --- validators ---
+
 const emailRegex =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
 const isEmail = (v) => emailRegex.test(v) && v.length <= 254;
 
-// 3–20, start with letter, letters/numbers/._-, not all digits
+
 const isUsername = (v) =>
   /^[A-Za-z][A-Za-z0-9._-]{2,19}$/.test(v) && !/^\d+$/.test(v);
 
@@ -18,10 +18,10 @@ const validatePassword = (password) => password.length >= 6 && password.length <
 
 export default function LogInPage({
   loginEndpoint = `${BASE_URL}`,
-  onSuccessNavigateTo = "/dashboard", // change if you want
+  onSuccessNavigateTo = "/dashboard", 
 }) {
   const navigate = useNavigate();
-  const [identifier, setIdentifier] = useState(""); // username or email
+  const [identifier, setIdentifier] = useState(""); 
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -41,7 +41,7 @@ export default function LogInPage({
     return () => clearTimeout(t);
   }, [message]);
   useEffect(() => {
-  // Check if user was redirected back here after failed login
+  
   const redirected = sessionStorage.getItem("loginRedirectFlag");
   if (redirected) {
     setMessage({
@@ -119,7 +119,7 @@ export default function LogInPage({
 
       setMessage({ type: "success", text: "Login successful!" });
 
-      // tiny delay so localStorage writes settle
+      
       setTimeout(() => {
   sessionStorage.setItem("loginRedirectFlag", "1");
   navigate(onSuccessNavigateTo, { replace: true });
@@ -134,19 +134,16 @@ export default function LogInPage({
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-6">
       <div className="w-full max-w-md bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl shadow-black/50 p-8">
-        {/* Brand */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <Shield className="w-7 h-7 text-white" />
           <span className="text-2xl font-bold text-white">SecuroServ</span>
         </div>
 
-        {/* Title */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold mb-1.5">Welcome back</h1>
           <p className="text-sm text-zinc-500">Log in with your email</p>
         </div>
 
-        {/* Message */}
         {message.text && (
           <div
             className={`mb-5 p-3 rounded-lg text-xs flex items-center gap-2 ${
@@ -162,7 +159,6 @@ export default function LogInPage({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Username / Email */}
           <div>
             <label htmlFor="id" className="block text-sm font-medium text-zinc-400 mb-2">
               Email
@@ -190,7 +186,6 @@ export default function LogInPage({
             )}
           </div>
 
-          {/* Password */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-zinc-400 mb-2">
               Password
@@ -233,7 +228,6 @@ export default function LogInPage({
             </div>
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
@@ -244,7 +238,6 @@ export default function LogInPage({
           </button>
         </form>
 
-        {/* Footer */}
         <div className="mt-8 text-center border-t border-zinc-900 pt-6">
           <p className="text-xs text-zinc-500">
             New to Vault?{" "}

@@ -25,8 +25,7 @@ const validatePassword = (password) => {
 const validateUsername = (username) => {
   
   if (!username) return false;
-  if (!/^[A-Za-z][A-Za-z0-9._-]{2,19}$/.test(username)) return false;
-  if (/^\d+$/.test(username)) return false;
+  
   return true;
 };
 

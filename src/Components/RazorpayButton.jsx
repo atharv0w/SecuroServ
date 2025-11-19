@@ -31,7 +31,7 @@ export default function RazorpayButton() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ amount: 100 }), 
+        body: JSON.stringify({ amount: 270000 }), 
       });
 
       if (!orderResponse.ok) {
